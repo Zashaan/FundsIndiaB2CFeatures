@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FundsIndia Mobile Advisor Call Designs</title>
+    <link rel="stylesheet" href="./mobile-call-scheduling-designs.css" />
+  </head>
+  <body>
+    <header class="board-header">
+      <div>
+        <p>FundsIndia B2C mobile app</p>
+        <h1>Advisor call scheduling design board</h1>
+      </div>
+      <div class="board-meta">
+        <span>Mobile-first</span>
+        <span>Trust-led guidance</span>
+        <span>Figma reference</span>
+      </div>
+    </header>
+
+    <main class="screen-board" aria-label="Mobile screen designs">
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Entry point</p>
+          <h2>Advisor Calls Tab</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen">
+            <header class="app-header">
+              <div>
+                <p class="eyebrow">Guidance</p>
+                <h3>Advisor Calls</h3>
+              </div>
+              <button class="icon-btn" aria-label="Notifications">⌁</button>
+            </header>
+
+            <section class="calm-banner">
+              <p>Your advisor can review your goals, SIPs, and recent conversations before the call.</p>
+              <button>Schedule a call</button>
+            </section>
+
+            <section class="upcoming-card">
+              <div class="section-title-row">
+                <h4>Upcoming</h4>
+                <span class="state-pill success">Confirmed</span>
+              </div>
+              <div class="call-row">
+                <div class="date-tile"><strong>18</strong><span>Jul</span></div>
+                <div>
+                  <strong>Education goal review</strong>
+                  <span>11:30 AM · Meera Iyer</span>
+                </div>
+              </div>
+              <div class="button-row">
+                <button class="secondary">Add context</button>
+                <button class="primary">View details</button>
+              </div>
+            </section>
+
+            <section>
+              <div class="section-title-row">
+                <h4>Suggested for you</h4>
+                <span>Based on goals</span>
+              </div>
+              <div class="suggestion-card">
+                <div class="mini-icon blue">↑</div>
+                <div>
+                  <strong>Salary increased recently?</strong>
+                  <p>Review whether your SIP should change for your daughter’s education goal.</p>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <div class="section-title-row">
+                <h4>Recent conversations</h4>
+                <button class="text-btn">View all</button>
+              </div>
+              <div class="compact-list">
+                <div>
+                  <strong>Education goal recalibration</strong>
+                  <span>Jun 16 · Follow-up due</span>
+                </div>
+                <div>
+                  <strong>Tax-saving funds</strong>
+                  <span>Apr 09 · ELSS and liquidity</span>
+                </div>
+              </div>
+            </section>
+          </div>
+          <nav class="bottom-nav">
+            <span>⌂<small>Home</small></span>
+            <span>▤<small>Portfolio</small></span>
+            <span>◎<small>Goals</small></span>
+            <span class="active">☎<small>Advisor</small></span>
+          </nav>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Step 1</p>
+          <h2>Choose Topic</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen with-sticky">
+            <header class="flow-header">
+              <button class="icon-btn">‹</button>
+              <div>
+                <p class="eyebrow">Step 1 of 5</p>
+                <h3>What do you need help with?</h3>
+              </div>
+            </header>
+            <div class="progress"><span style="width: 20%"></span></div>
+
+            <div class="topic-list">
+              <button class="topic-option selected">
+                <span class="mini-icon teal">□</span>
+                <span><strong>Portfolio review</strong><small>Check allocation and underperformers</small></span>
+              </button>
+              <button class="topic-option">
+                <span class="mini-icon blue">↑</span>
+                <span><strong>SIP increase</strong><small>Plan after income or savings changes</small></span>
+              </button>
+              <button class="topic-option">
+                <span class="mini-icon amber">₹</span>
+                <span><strong>Tax or redemption</strong><small>Understand exit load and tax impact</small></span>
+              </button>
+              <button class="topic-option">
+                <span class="mini-icon rose">◇</span>
+                <span><strong>Family goals</strong><small>Coordinate spouse and child goals</small></span>
+              </button>
+              <button class="topic-option">
+                <span class="mini-icon slate">N</span>
+                <span><strong>NRI investing</strong><small>Handle rules, accounts, and goals</small></span>
+              </button>
+            </div>
+          </div>
+          <div class="sticky-cta"><button class="primary full">Continue</button></div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Step 2</p>
+          <h2>Add Context</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen with-sticky">
+            <header class="flow-header">
+              <button class="icon-btn">‹</button>
+              <div>
+                <p class="eyebrow">Step 2 of 5</p>
+                <h3>Tell your advisor what is on your mind</h3>
+              </div>
+            </header>
+            <div class="progress"><span style="width: 40%"></span></div>
+
+            <label class="field-label">Investor note</label>
+            <div class="note-box">
+              I want to know if my current SIP is enough for my daughter’s education goal. My salary increased recently.
+            </div>
+
+            <div class="helper-prompts">
+              <span>Is my SIP enough?</span>
+              <span>Should I redeem?</span>
+              <span>How much tax?</span>
+            </div>
+
+            <section class="form-card">
+              <h4>Connect this call to</h4>
+              <div class="select-row">
+                <span>Goal</span>
+                <strong>Daughter’s education</strong>
+              </div>
+              <div class="select-row">
+                <span>Portfolio area</span>
+                <strong>Equity mutual funds</strong>
+              </div>
+            </section>
+
+            <section class="form-card">
+              <label class="switch-row"><span>Include previous call summaries</span><i></i></label>
+              <label class="switch-row"><span>Share portfolio snapshot</span><i></i></label>
+            </section>
+          </div>
+          <div class="sticky-cta"><button class="primary full">Create advisor brief</button></div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Step 3</p>
+          <h2>Review AI Brief</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen with-sticky">
+            <header class="flow-header">
+              <button class="icon-btn">‹</button>
+              <div>
+                <p class="eyebrow">Step 3 of 5</p>
+                <h3>Review what your advisor will see</h3>
+              </div>
+            </header>
+            <div class="progress"><span style="width: 60%"></span></div>
+
+            <section class="brief-card">
+              <div class="section-title-row">
+                <h4>Advisor brief</h4>
+                <span class="state-pill success">Ready</span>
+              </div>
+              <p>Ananya wants to understand whether her current SIP is enough for her daughter’s education goal after a recent salary increase.</p>
+              <div class="tag-wrap">
+                <span>Education goal</span>
+                <span>SIP adequacy</span>
+                <span>Income change</span>
+                <span>Risk comfort</span>
+              </div>
+            </section>
+
+            <section class="form-card">
+              <h4>Prior context attached</h4>
+              <div class="memory-row">
+                <span>Jun 16</span>
+                <strong>Education goal recalibration</strong>
+              </div>
+              <div class="memory-row">
+                <span>Apr 09</span>
+                <strong>ELSS and liquidity discussion</strong>
+              </div>
+            </section>
+
+            <div class="button-row stacked">
+              <button class="secondary full">Edit brief</button>
+              <button class="secondary full">Regenerate</button>
+            </div>
+          </div>
+          <div class="sticky-cta"><button class="primary full">Continue</button></div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Step 4</p>
+          <h2>Choose Advisor</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen with-sticky">
+            <header class="flow-header">
+              <button class="icon-btn">‹</button>
+              <div>
+                <p class="eyebrow">Step 4 of 5</p>
+                <h3>Choose who you want to speak with</h3>
+              </div>
+            </header>
+            <div class="progress"><span style="width: 80%"></span></div>
+
+            <button class="recommended-advisor">
+              <span class="avatar">FI</span>
+              <span><strong>Best available advisor</strong><small>Fastest conflict-free slot for this topic</small></span>
+              <em>Recommended</em>
+            </button>
+
+            <div class="advisor-card selected">
+              <div class="advisor-top">
+                <span class="avatar meera">MI</span>
+                <div>
+                  <strong>Meera Iyer</strong>
+                  <span>Goal planning specialist</span>
+                </div>
+              </div>
+              <div class="advisor-meta">
+                <span>English, Hindi</span>
+                <span>Next: Today 11:30 AM</span>
+              </div>
+            </div>
+
+            <div class="advisor-card">
+              <div class="advisor-top">
+                <span class="avatar rohan">RM</span>
+                <div>
+                  <strong>Rohan Menon</strong>
+                  <span>Tax and redemption specialist</span>
+                </div>
+              </div>
+              <div class="advisor-meta">
+                <span>English, Malayalam</span>
+                <span>Next: Tomorrow 2:00 PM</span>
+              </div>
+            </div>
+          </div>
+          <div class="sticky-cta"><button class="primary full">Choose time</button></div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Step 5</p>
+          <h2>Choose Time</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen with-sticky">
+            <header class="flow-header">
+              <button class="icon-btn">‹</button>
+              <div>
+                <p class="eyebrow">Step 5 of 5</p>
+                <h3>Pick a conflict-free time</h3>
+              </div>
+            </header>
+            <div class="progress"><span style="width: 100%"></span></div>
+
+            <section class="calendar-card">
+              <div class="mini-icon google">G</div>
+              <div>
+                <strong>Connect Google Calendar</strong>
+                <p>Suggest times that avoid conflicts for you and the advisor.</p>
+              </div>
+            </section>
+
+            <div class="date-strip">
+              <button class="selected"><strong>Today</strong><span>14 Jul</span></button>
+              <button><strong>Wed</strong><span>15 Jul</span></button>
+              <button><strong>Thu</strong><span>16 Jul</span></button>
+              <button><strong>Fri</strong><span>17 Jul</span></button>
+            </div>
+
+            <h4>Available slots</h4>
+            <div class="slot-grid">
+              <button>10:00 AM</button>
+              <button class="selected">11:30 AM</button>
+              <button>2:00 PM</button>
+              <button>4:30 PM</button>
+              <button>6:00 PM</button>
+            </div>
+
+            <section class="selected-slot">
+              <span>Selected</span>
+              <strong>Today · 11:30 AM with Meera Iyer</strong>
+              <p>30 min phone call · IST</p>
+            </section>
+          </div>
+          <div class="sticky-cta"><button class="primary full">Review booking</button></div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Confirmation</p>
+          <h2>Booking Review</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen with-sticky">
+            <header class="flow-header">
+              <button class="icon-btn">‹</button>
+              <div>
+                <p class="eyebrow">Confirm</p>
+                <h3>Review and schedule</h3>
+              </div>
+            </header>
+
+            <section class="confirm-hero">
+              <span class="large-icon">✓</span>
+              <h4>Advisor is ready with your context</h4>
+              <p>Your brief, related goal, and past conversation summaries will be attached.</p>
+            </section>
+
+            <section class="detail-list">
+              <div><span>Topic</span><strong>Portfolio review</strong></div>
+              <div><span>Advisor</span><strong>Meera Iyer</strong></div>
+              <div><span>Time</span><strong>Today, 11:30 AM</strong></div>
+              <div><span>Calendar</span><strong>Not connected</strong></div>
+            </section>
+          </div>
+          <div class="sticky-cta"><button class="primary full">Schedule call</button></div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Success</p>
+          <h2>Scheduled Call</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen">
+            <section class="success-screen">
+              <span class="large-icon">✓</span>
+              <h3>Call scheduled</h3>
+              <p>Meera will review your brief before the call.</p>
+            </section>
+            <section class="upcoming-card">
+              <div class="call-row">
+                <div class="date-tile"><strong>14</strong><span>Jul</span></div>
+                <div>
+                  <strong>Portfolio review</strong>
+                  <span>11:30 AM · Meera Iyer</span>
+                </div>
+              </div>
+              <div class="button-row">
+                <button class="secondary">Add to calendar</button>
+                <button class="primary">View details</button>
+              </div>
+            </section>
+            <button class="secondary full">Back to Advisor Calls</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Detail</p>
+          <h2>Upcoming Call</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen">
+            <header class="flow-header">
+              <button class="icon-btn">‹</button>
+              <div>
+                <p class="eyebrow">Upcoming call</p>
+                <h3>Portfolio review</h3>
+              </div>
+            </header>
+
+            <section class="call-detail-hero">
+              <span>Starts in</span>
+              <strong>2 days</strong>
+              <p>14 Jul · 11:30 AM · 30 min</p>
+            </section>
+
+            <section class="advisor-card flat">
+              <div class="advisor-top">
+                <span class="avatar meera">MI</span>
+                <div><strong>Meera Iyer</strong><span>Goal planning specialist</span></div>
+              </div>
+            </section>
+
+            <section class="brief-card">
+              <h4>Shared brief</h4>
+              <p>Ananya wants to check if her current SIP is enough for her daughter’s education goal after a salary increase.</p>
+            </section>
+
+            <div class="button-row stacked">
+              <button class="primary full">Add more context</button>
+              <button class="secondary full">Reschedule</button>
+              <button class="danger full">Cancel call</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Memory</p>
+          <h2>Previous Calls</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen">
+            <header class="app-header">
+              <div>
+                <p class="eyebrow">Memory</p>
+                <h3>Previous calls</h3>
+              </div>
+            </header>
+
+            <div class="search-box">Search summaries, topics, advisors</div>
+            <div class="filter-strip">
+              <span class="selected">All</span>
+              <span>Goals</span>
+              <span>Tax</span>
+              <span>SIP</span>
+            </div>
+
+            <div class="timeline-list">
+              <article>
+                <span>Jun 16</span>
+                <strong>Education goal recalibration</strong>
+                <p>Advisor suggested reviewing equity allocation after salary revision.</p>
+                <em>Follow-up due</em>
+              </article>
+              <article>
+                <span>Apr 09</span>
+                <strong>Tax-saving funds and liquidity</strong>
+                <p>No redemption recommended because emergency fund was below target.</p>
+              </article>
+              <article>
+                <span>Feb 21</span>
+                <strong>Family account setup</strong>
+                <p>Discussed visibility for spouse without combining ownership.</p>
+              </article>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Detail</p>
+          <h2>Past Call Summary</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen">
+            <header class="flow-header">
+              <button class="icon-btn">‹</button>
+              <div>
+                <p class="eyebrow">Jun 16 · Meera Iyer</p>
+                <h3>Education goal recalibration</h3>
+              </div>
+            </header>
+
+            <section class="brief-card">
+              <h4>Summary</h4>
+              <p>Discussed increasing SIP by ₹12,000 if bonus income becomes recurring. Advisor suggested a risk review before adding more equity.</p>
+            </section>
+
+            <section class="detail-list">
+              <div><span>Decision</span><strong>Wait for salary revision confirmation</strong></div>
+              <div><span>Action item</span><strong>Review goal projection in July</strong></div>
+              <div><span>Related goal</span><strong>Daughter’s education</strong></div>
+            </section>
+
+            <div class="button-row stacked">
+              <button class="primary full">Schedule follow-up</button>
+              <button class="secondary full">Download summary</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Bottom sheet</p>
+          <h2>Calendar Connection</h2>
+        </div>
+        <article class="phone sheet-demo">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen dimmed">
+            <header class="flow-header">
+              <button class="icon-btn">‹</button>
+              <div><p class="eyebrow">Step 5 of 5</p><h3>Pick a conflict-free time</h3></div>
+            </header>
+            <div class="slot-grid ghost">
+              <button>10:00 AM</button><button>11:30 AM</button><button>2:00 PM</button><button>4:30 PM</button>
+            </div>
+          </div>
+          <div class="bottom-sheet">
+            <span class="sheet-handle"></span>
+            <div class="mini-icon google">G</div>
+            <h3>Connect Google Calendar?</h3>
+            <p>FundsIndia will only use your calendar to suggest available call times. Event details stay private.</p>
+            <button class="primary full">Connect calendar</button>
+            <button class="secondary full">Continue without calendar</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>Bottom sheet</p>
+          <h2>Cancel Call</h2>
+        </div>
+        <article class="phone sheet-demo">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen dimmed">
+            <section class="call-detail-hero">
+              <span>Starts in</span>
+              <strong>2 days</strong>
+              <p>14 Jul · 11:30 AM · 30 min</p>
+            </section>
+          </div>
+          <div class="bottom-sheet">
+            <span class="sheet-handle"></span>
+            <h3>Cancel advisor call?</h3>
+            <p>Meera will no longer receive this meeting slot. Your advisor brief will stay saved if you schedule again.</p>
+            <button class="danger full">Cancel call</button>
+            <button class="secondary full">Keep call</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen-group">
+        <div class="group-heading">
+          <p>States</p>
+          <h2>Empty & Error</h2>
+        </div>
+        <article class="phone">
+          <div class="status-bar"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-screen">
+            <header class="app-header">
+              <div><p class="eyebrow">Advisor Calls</p><h3>No calls yet</h3></div>
+            </header>
+            <section class="empty-state">
+              <span class="large-icon muted">☎</span>
+              <h4>Get guidance before you decide</h4>
+              <p>Schedule your first advisor call for SIPs, goals, taxes, or portfolio questions.</p>
+              <button class="primary full">Schedule a call</button>
+            </section>
+            <section class="error-card">
+              <strong>No slots available today</strong>
+              <p>Try another date or choose best available advisor.</p>
+              <button class="secondary full">See next available</button>
+            </section>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

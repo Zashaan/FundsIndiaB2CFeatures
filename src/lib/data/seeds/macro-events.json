@@ -1,0 +1,281 @@
+[
+  {
+    "id": "evt-01",
+    "date": "2026-04-11",
+    "headline": "RBI holds repo rate steady, signals rates may stay higher for longer",
+    "category": "rate_expectations",
+    "relatedSectors": [
+      "Banking"
+    ],
+    "relatedAssetClasses": [
+      "debt"
+    ],
+    "sentiment": "negative",
+    "magnitude": 0.5,
+    "summary": "The Reserve Bank of India kept the repo rate unchanged and indicated that interest rates could remain elevated for longer than previously expected."
+  },
+  {
+    "id": "evt-02",
+    "date": "2026-04-16",
+    "headline": "IT sector rallies after strong Q4 earnings and robust US tech demand",
+    "category": "sector_movement",
+    "relatedSectors": [
+      "IT",
+      "Global"
+    ],
+    "relatedAssetClasses": [
+      "equity",
+      "international"
+    ],
+    "sentiment": "positive",
+    "magnitude": 0.7,
+    "summary": "Major IT exporters reported better-than-expected quarterly earnings, and demand from US technology clients remained strong, lifting IT sector stocks."
+  },
+  {
+    "id": "evt-03",
+    "date": "2026-04-20",
+    "headline": "Nifty and Sensex see mild correction after recent highs",
+    "category": "market_correction",
+    "relatedSectors": [
+      "Diversified"
+    ],
+    "relatedAssetClasses": [
+      "equity"
+    ],
+    "sentiment": "negative",
+    "magnitude": 0.4,
+    "summary": "Indian benchmark indices corrected mildly as investors booked profits following a recent run-up to new highs."
+  },
+  {
+    "id": "evt-04",
+    "date": "2026-04-26",
+    "headline": "Banking stocks gain on better-than-expected credit growth",
+    "category": "sector_movement",
+    "relatedSectors": [
+      "Banking"
+    ],
+    "relatedAssetClasses": [
+      "equity"
+    ],
+    "sentiment": "positive",
+    "magnitude": 0.5,
+    "summary": "Banks reported stronger credit growth numbers than analysts expected, pushing banking sector stocks higher."
+  },
+  {
+    "id": "evt-05",
+    "date": "2026-05-02",
+    "headline": "US Nasdaq declines on tech valuation concerns",
+    "category": "global_markets",
+    "relatedSectors": [
+      "IT",
+      "Global"
+    ],
+    "relatedAssetClasses": [
+      "international"
+    ],
+    "sentiment": "negative",
+    "magnitude": 0.6,
+    "summary": "US technology stocks fell as investors grew cautious about stretched valuations in the sector."
+  },
+  {
+    "id": "evt-06",
+    "date": "2026-05-08",
+    "headline": "Rupee weakens against the dollar amid rising crude oil prices",
+    "category": "currency",
+    "relatedSectors": [
+      "Diversified"
+    ],
+    "relatedAssetClasses": [
+      "international"
+    ],
+    "sentiment": "negative",
+    "magnitude": 0.3,
+    "summary": "The Indian Rupee weakened against the US Dollar as crude oil prices climbed, raising import cost concerns."
+  },
+  {
+    "id": "evt-07",
+    "date": "2026-05-14",
+    "headline": "Manufacturing PMI beats expectations, small and mid-cap stocks gain",
+    "category": "sector_movement",
+    "relatedSectors": [
+      "Auto",
+      "Infra",
+      "Diversified"
+    ],
+    "relatedAssetClasses": [
+      "equity"
+    ],
+    "sentiment": "positive",
+    "magnitude": 0.65,
+    "summary": "Manufacturing activity data came in stronger than expected, boosting infrastructure and auto-linked small and mid-cap stocks."
+  },
+  {
+    "id": "evt-08",
+    "date": "2026-05-20",
+    "headline": "RBI commentary hints at a possible rate cut later in the year",
+    "category": "rate_expectations",
+    "relatedSectors": [
+      "Banking"
+    ],
+    "relatedAssetClasses": [
+      "debt"
+    ],
+    "sentiment": "positive",
+    "magnitude": 0.4,
+    "summary": "The central bank's policy commentary suggested it may consider cutting rates later in the year if inflation continues to ease."
+  },
+  {
+    "id": "evt-09",
+    "date": "2026-05-26",
+    "headline": "Broader markets correct sharply amid global risk-off sentiment",
+    "category": "market_correction",
+    "relatedSectors": [
+      "Diversified"
+    ],
+    "relatedAssetClasses": [
+      "equity"
+    ],
+    "sentiment": "negative",
+    "magnitude": 0.75,
+    "summary": "Indian equity markets fell sharply, tracking a broad risk-off move across global markets."
+  },
+  {
+    "id": "evt-10",
+    "date": "2026-05-31",
+    "headline": "US Federal Reserve signals pause in rate hikes",
+    "category": "global_markets",
+    "relatedSectors": [
+      "Global"
+    ],
+    "relatedAssetClasses": [
+      "international"
+    ],
+    "sentiment": "positive",
+    "magnitude": 0.5,
+    "summary": "The US Federal Reserve signaled it would pause further rate hikes, boosting risk appetite in global markets."
+  },
+  {
+    "id": "evt-11",
+    "date": "2026-06-05",
+    "headline": "IT stocks correct after a major exporter cuts revenue guidance",
+    "category": "sector_movement",
+    "relatedSectors": [
+      "IT"
+    ],
+    "relatedAssetClasses": [
+      "equity",
+      "international"
+    ],
+    "sentiment": "negative",
+    "magnitude": 0.55,
+    "summary": "A large IT exporter lowered its revenue guidance for the year, weighing on IT sector stocks broadly."
+  },
+  {
+    "id": "evt-12",
+    "date": "2026-06-11",
+    "headline": "Rupee strengthens as crude oil prices ease",
+    "category": "currency",
+    "relatedSectors": [
+      "Diversified"
+    ],
+    "relatedAssetClasses": [
+      "international"
+    ],
+    "sentiment": "positive",
+    "magnitude": 0.25,
+    "summary": "The Rupee strengthened against the Dollar as crude oil prices retreated from recent highs."
+  },
+  {
+    "id": "evt-13",
+    "date": "2026-06-15",
+    "headline": "Small-cap stocks rally on strong industrial production data",
+    "category": "sector_movement",
+    "relatedSectors": [
+      "Auto",
+      "Infra",
+      "Diversified"
+    ],
+    "relatedAssetClasses": [
+      "equity"
+    ],
+    "sentiment": "positive",
+    "magnitude": 0.6,
+    "summary": "Industrial production data exceeded expectations, driving a rally in small-cap and infrastructure-linked stocks."
+  },
+  {
+    "id": "evt-14",
+    "date": "2026-06-19",
+    "headline": "RBI maintains repo rate, reiterates wait-and-watch stance",
+    "category": "rate_expectations",
+    "relatedSectors": [
+      "Banking"
+    ],
+    "relatedAssetClasses": [
+      "debt"
+    ],
+    "sentiment": "neutral",
+    "magnitude": 0.3,
+    "summary": "The Reserve Bank of India held rates steady again, reiterating a cautious, data-dependent approach."
+  },
+  {
+    "id": "evt-15",
+    "date": "2026-06-23",
+    "headline": "Global technology stocks correct on mixed earnings",
+    "category": "global_markets",
+    "relatedSectors": [
+      "IT",
+      "Global"
+    ],
+    "relatedAssetClasses": [
+      "international"
+    ],
+    "sentiment": "negative",
+    "magnitude": 0.6,
+    "summary": "Major US technology companies reported mixed earnings, triggering a correction in global tech stocks."
+  },
+  {
+    "id": "evt-16",
+    "date": "2026-06-27",
+    "headline": "Gold rallies on safe-haven demand amid geopolitical tensions",
+    "category": "sector_movement",
+    "relatedSectors": [
+      "Gold"
+    ],
+    "relatedAssetClasses": [
+      "gold"
+    ],
+    "sentiment": "positive",
+    "magnitude": 0.5,
+    "summary": "Gold prices rose as investors sought safe-haven assets amid rising geopolitical tensions."
+  },
+  {
+    "id": "evt-17",
+    "date": "2026-07-01",
+    "headline": "Markets recover modestly as inflation data comes in below expectations",
+    "category": "market_correction",
+    "relatedSectors": [
+      "Diversified"
+    ],
+    "relatedAssetClasses": [
+      "equity"
+    ],
+    "sentiment": "positive",
+    "magnitude": 0.4,
+    "summary": "Indian equity markets recovered some lost ground after inflation data came in cooler than expected."
+  },
+  {
+    "id": "evt-18",
+    "date": "2026-07-04",
+    "headline": "Banking stocks dip slightly on profit booking after recent rally",
+    "category": "sector_movement",
+    "relatedSectors": [
+      "Banking"
+    ],
+    "relatedAssetClasses": [
+      "equity"
+    ],
+    "sentiment": "negative",
+    "magnitude": 0.3,
+    "summary": "Banking stocks eased slightly as investors booked profits following their recent rally."
+  }
+]

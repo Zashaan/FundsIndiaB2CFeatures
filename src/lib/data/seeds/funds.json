@@ -1,0 +1,93 @@
+[
+  {
+    "id": "FI-001",
+    "name": "FundsIndia Bluechip Growth Fund",
+    "amc": "FundsIndia AMC",
+    "category": "Large Cap",
+    "assetClass": "equity",
+    "sectorTilt": [
+      "Banking",
+      "Diversified"
+    ],
+    "riskLevel": "moderate",
+    "inceptionNav": 145,
+    "expenseRatio": 0.9
+  },
+  {
+    "id": "FI-002",
+    "name": "FundsIndia Tech Opportunities Fund",
+    "amc": "FundsIndia AMC",
+    "category": "Sectoral - IT",
+    "assetClass": "equity",
+    "sectorTilt": [
+      "IT"
+    ],
+    "riskLevel": "high",
+    "inceptionNav": 62,
+    "expenseRatio": 1.1
+  },
+  {
+    "id": "FI-003",
+    "name": "FundsIndia Emerging Small Cap Fund",
+    "amc": "FundsIndia AMC",
+    "category": "Small Cap",
+    "assetClass": "equity",
+    "sectorTilt": [
+      "Auto",
+      "Infra",
+      "Diversified"
+    ],
+    "riskLevel": "very high",
+    "inceptionNav": 38,
+    "expenseRatio": 1.3
+  },
+  {
+    "id": "FI-004",
+    "name": "FundsIndia US Equity Fund of Fund",
+    "amc": "FundsIndia AMC",
+    "category": "International - US",
+    "assetClass": "international",
+    "sectorTilt": [
+      "Global",
+      "IT"
+    ],
+    "riskLevel": "high",
+    "inceptionNav": 28,
+    "expenseRatio": 1.2
+  },
+  {
+    "id": "FI-005",
+    "name": "FundsIndia Short Duration Debt Fund",
+    "amc": "FundsIndia AMC",
+    "category": "Debt - Short Duration",
+    "assetClass": "debt",
+    "sectorTilt": [],
+    "riskLevel": "low",
+    "inceptionNav": 24,
+    "expenseRatio": 0.4
+  },
+  {
+    "id": "FI-006",
+    "name": "FundsIndia Liquid Fund",
+    "amc": "FundsIndia AMC",
+    "category": "Liquid",
+    "assetClass": "liquid",
+    "sectorTilt": [],
+    "riskLevel": "low",
+    "inceptionNav": 1850,
+    "expenseRatio": 0.2
+  },
+  {
+    "id": "FI-007",
+    "name": "FundsIndia Gold ETF Fund of Fund",
+    "amc": "FundsIndia AMC",
+    "category": "Gold ETF",
+    "assetClass": "gold",
+    "sectorTilt": [
+      "Gold"
+    ],
+    "riskLevel": "moderate",
+    "inceptionNav": 55,
+    "expenseRatio": 0.5
+  }
+]

@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FundsIndia Advisor Calls Prototype</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="FundsIndia navigation">
+        <div class="brand-lockup">
+          <div class="brand-mark">FI</div>
+          <div>
+            <strong>FundsIndia</strong>
+            <span>B2C investor app</span>
+          </div>
+        </div>
+
+        <nav class="main-nav" aria-label="Primary">
+          <a href="#" class="nav-item">Portfolio</a>
+          <a href="#" class="nav-item">Goals</a>
+          <a href="#" class="nav-item active">Advisor calls</a>
+          <a href="#" class="nav-item">Research</a>
+          <a href="#" class="nav-item">Transfers</a>
+        </nav>
+
+        <div class="trust-panel">
+          <span class="status-dot"></span>
+          <div>
+            <strong>Service status</strong>
+            <span>All advisory systems online</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Advisor calls</p>
+            <h1>Schedule guidance with context already prepared</h1>
+          </div>
+          <div class="investor-pill" aria-label="Current investor profile">
+            <span class="avatar">AS</span>
+            <div>
+              <strong>Ananya Sharma</strong>
+              <span>Mass affluent · Moderate risk</span>
+            </div>
+          </div>
+        </header>
+
+        <section class="summary-strip" aria-label="Investor context">
+          <div>
+            <span>Portfolio value</span>
+            <strong>₹46.8L</strong>
+          </div>
+          <div>
+            <span>Monthly SIP</span>
+            <strong>₹62,000</strong>
+          </div>
+          <div>
+            <span>Active goals</span>
+            <strong>4</strong>
+          </div>
+          <div>
+            <span>Last advisor call</span>
+            <strong>28 days ago</strong>
+          </div>
+        </section>
+
+        <div class="content-grid">
+          <section class="scheduler-panel" aria-labelledby="schedule-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">New call</p>
+                <h2 id="schedule-title">What should the advisor help with?</h2>
+              </div>
+              <button class="icon-button" id="clear-form" type="button" aria-label="Reset form" title="Reset form">
+                ↺
+              </button>
+            </div>
+
+            <div class="topic-grid" role="radiogroup" aria-label="Call topic">
+              <button class="topic-card active" type="button" data-topic="Portfolio review">
+                <span class="topic-icon">□</span>
+                <strong>Portfolio review</strong>
+                <small>Check allocation, underperformers, and next steps.</small>
+              </button>
+              <button class="topic-card" type="button" data-topic="SIP increase">
+                <span class="topic-icon">△</span>
+                <strong>SIP increase</strong>
+                <small>Discuss income changes and goal timelines.</small>
+              </button>
+              <button class="topic-card" type="button" data-topic="Redeem or tax">
+                <span class="topic-icon">₹</span>
+                <strong>Redeem or tax</strong>
+                <small>Understand exit load, tax, and cash needs.</small>
+              </button>
+              <button class="topic-card" type="button" data-topic="Family goals">
+                <span class="topic-icon">◇</span>
+                <strong>Family goals</strong>
+                <small>Coordinate spouse, children, and shared goals.</small>
+              </button>
+            </div>
+
+            <label class="field-label" for="meeting-notes">Investor note</label>
+            <textarea id="meeting-notes" rows="5">I want to know if my current SIP is enough for my daughter's education goal. My salary increased recently and I am unsure whether to add more to equity funds or keep money in safer debt funds.</textarea>
+
+            <div class="action-row">
+              <button class="primary-button" id="generate-brief" type="button">Create advisor brief</button>
+              <label class="toggle">
+                <input id="share-history" type="checkbox" checked />
+                <span></span>
+                Include prior calls
+              </label>
+            </div>
+
+            <div class="brief-panel" aria-live="polite">
+              <div class="brief-header">
+                <div>
+                  <p class="eyebrow">AI-prepared context</p>
+                  <h3>Advisor brief</h3>
+                </div>
+                <span class="confidence-badge">Ready</span>
+              </div>
+              <p id="brief-text">
+                Ananya wants a portfolio review focused on her daughter's education goal. She has a recent salary increase and needs help deciding whether to raise SIPs into equity funds or keep the increase in lower-risk debt funds.
+              </p>
+              <div class="brief-tags" id="brief-tags">
+                <span>Education goal</span>
+                <span>SIP adequacy</span>
+                <span>Risk comfort</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="availability-panel" aria-labelledby="availability-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Availability</p>
+                <h2 id="availability-title">Pick a conflict-free slot</h2>
+              </div>
+              <button class="secondary-button" id="connect-calendar" type="button">Connect Google Calendar</button>
+            </div>
+
+            <div class="calendar-state" id="calendar-state">
+              <div class="calendar-icon">G</div>
+              <div>
+                <strong>Calendar not connected</strong>
+                <span>Slots are based on advisor availability only.</span>
+              </div>
+            </div>
+
+            <div class="advisor-list" aria-label="Advisor options">
+              <button class="advisor-option active" type="button" data-advisor="Meera Iyer" data-specialty="Goal planning specialist">
+                <span class="advisor-avatar meera">MI</span>
+                <span>
+                  <strong>Meera Iyer</strong>
+                  <small>Goal planning specialist</small>
+                </span>
+              </button>
+              <button class="advisor-option" type="button" data-advisor="Rohan Menon" data-specialty="Tax and redemption specialist">
+                <span class="advisor-avatar rohan">RM</span>
+                <span>
+                  <strong>Rohan Menon</strong>
+                  <small>Tax and redemption specialist</small>
+                </span>
+              </button>
+            </div>
+
+            <div class="slot-toolbar">
+              <button class="chip active" type="button" data-day="Today">Today</button>
+              <button class="chip" type="button" data-day="Tomorrow">Tomorrow</button>
+              <button class="chip" type="button" data-day="This week">This week</button>
+            </div>
+
+            <div class="slot-grid" id="slot-grid" aria-label="Available time slots">
+              <button class="slot active" type="button" data-time="11:30 AM">11:30 AM</button>
+              <button class="slot" type="button" data-time="2:00 PM">2:00 PM</button>
+              <button class="slot" type="button" data-time="4:30 PM">4:30 PM</button>
+              <button class="slot" type="button" data-time="6:00 PM">6:00 PM</button>
+            </div>
+
+            <div class="booking-preview">
+              <div>
+                <span>Selected call</span>
+                <strong id="selected-call">Today · 11:30 AM with Meera Iyer</strong>
+              </div>
+              <button class="primary-button" id="schedule-call" type="button">Schedule call</button>
+            </div>
+          </section>
+
+          <section class="history-panel" aria-labelledby="history-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Memory</p>
+                <h2 id="history-title">Previous conversations</h2>
+              </div>
+              <input class="history-search" id="history-search" type="search" placeholder="Search calls" aria-label="Search previous calls" />
+            </div>
+
+            <div class="timeline" id="timeline">
+              <article class="timeline-item" data-keywords="education daughter sip goal">
+                <div class="timeline-date">Jun 16</div>
+                <div>
+                  <h3>Education goal recalibration</h3>
+                  <p>Discussed increasing SIP by ₹12,000 if bonus income becomes recurring. Advisor suggested reviewing equity allocation after salary revision.</p>
+                  <div class="mini-tags">
+                    <span>Follow-up due</span>
+                    <span>Goal planning</span>
+                  </div>
+                </div>
+              </article>
+              <article class="timeline-item" data-keywords="tax redeem elss cash">
+                <div class="timeline-date">Apr 09</div>
+                <div>
+                  <h3>Tax-saving funds and liquidity</h3>
+                  <p>Compared ELSS lock-in against near-term liquidity needs. No redemption recommended because emergency fund was below target.</p>
+                  <div class="mini-tags">
+                    <span>ELSS</span>
+                    <span>Emergency fund</span>
+                  </div>
+                </div>
+              </article>
+              <article class="timeline-item" data-keywords="spouse family joint goals">
+                <div class="timeline-date">Feb 21</div>
+                <div>
+                  <h3>Family account setup</h3>
+                  <p>Explored linking spouse profile for shared home down-payment tracking. Investor wanted visibility without combining ownership.</p>
+                  <div class="mini-tags">
+                    <span>Family goals</span>
+                    <span>Access control</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="prep-panel" aria-labelledby="prep-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Advisor view</p>
+                <h2 id="prep-title">Context sent before the call</h2>
+              </div>
+            </div>
+
+            <dl class="prep-list">
+              <div>
+                <dt>Topic</dt>
+                <dd id="prep-topic">Portfolio review</dd>
+              </div>
+              <div>
+                <dt>Investor concern</dt>
+                <dd id="prep-concern">Education goal, salary increase, equity versus debt comfort.</dd>
+              </div>
+              <div>
+                <dt>Useful records</dt>
+                <dd>Last 3 call summaries, goal projections, SIP transactions.</dd>
+              </div>
+              <div>
+                <dt>Suggested outcome</dt>
+                <dd>Confirm whether SIP should increase and explain risk tradeoffs in plain language.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      Call scheduled. Advisor brief and prior summaries have been attached.
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

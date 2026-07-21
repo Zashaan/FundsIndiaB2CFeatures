@@ -1,0 +1,74 @@
+[
+  {
+    "id": "txn-001",
+    "date": "2026-04-21",
+    "fundId": "FI-001",
+    "type": "sip",
+    "amount": 5000,
+    "units": 34.614,
+    "navAtTransaction": 144.45
+  },
+  {
+    "id": "txn-002",
+    "date": "2026-04-21",
+    "fundId": "FI-002",
+    "type": "sip",
+    "amount": 3000,
+    "units": 47.304,
+    "navAtTransaction": 63.42
+  },
+  {
+    "id": "txn-003",
+    "date": "2026-05-21",
+    "fundId": "FI-001",
+    "type": "sip",
+    "amount": 5000,
+    "units": 34.499,
+    "navAtTransaction": 144.93
+  },
+  {
+    "id": "txn-004",
+    "date": "2026-05-21",
+    "fundId": "FI-002",
+    "type": "sip",
+    "amount": 3000,
+    "units": 47.044,
+    "navAtTransaction": 63.77
+  },
+  {
+    "id": "txn-005",
+    "date": "2026-06-20",
+    "fundId": "FI-001",
+    "type": "sip",
+    "amount": 5000,
+    "units": 35.043,
+    "navAtTransaction": 142.68
+  },
+  {
+    "id": "txn-006",
+    "date": "2026-06-20",
+    "fundId": "FI-002",
+    "type": "sip",
+    "amount": 3000,
+    "units": 47.446,
+    "navAtTransaction": 63.23
+  },
+  {
+    "id": "txn-007",
+    "date": "2026-05-16",
+    "fundId": "FI-004",
+    "type": "buy",
+    "amount": 50000,
+    "units": 1795.977,
+    "navAtTransaction": 27.84
+  },
+  {
+    "id": "txn-008",
+    "date": "2026-06-17",
+    "fundId": "FI-003",
+    "type": "sell",
+    "amount": 15000,
+    "units": 423.729,
+    "navAtTransaction": 35.4
+  }
+]
