@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 
 type Step = "home" | "topic" | "context" | "brief" | "advisor" | "time" | "confirm" | "success" | "history" | "detail";
@@ -118,14 +119,14 @@ function StepHeader({
         >
           ‹
         </button>
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-bold uppercase tracking-normal text-emerald-700">{eyebrow}</p>
           <h1 className="text-2xl font-bold leading-tight text-slate-950">{title}</h1>
         </div>
       </div>
       {progress ? (
         <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-200">
-          <div className="h-full rounded-full bg-emerald-600" style={{ width: `${progress}%` }} />
+          <div className="h-full rounded-full bg-[linear-gradient(90deg,#00c781,#006bff)]" style={{ width: `${progress}%` }} />
         </div>
       ) : null}
     </>
@@ -138,7 +139,7 @@ function BottomAction({ label, onClick }: { label: string; onClick: () => void }
       <button
         type="button"
         onClick={onClick}
-        className="h-12 w-full rounded-2xl bg-emerald-600 text-sm font-bold text-white shadow-sm"
+        className="h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white shadow-lg shadow-emerald-900/10"
       >
         {label}
       </button>
@@ -245,16 +246,22 @@ export function AdvisorCallsApp() {
   if (step === "success") {
     return (
       <div className="space-y-5 px-4 pb-28">
-        <section className="mt-8 rounded-3xl bg-white p-6 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-emerald-50 text-2xl font-bold text-emerald-700">
-            OK
+        <section className="mt-8 overflow-hidden rounded-3xl border border-emerald-100 bg-white p-6 text-center shadow-sm">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[28px] bg-[linear-gradient(135deg,#ecfff7,#eef7ff)]">
+            <Image
+              src="/fundsindia-logo.png"
+              alt="FundsIndia"
+              width={84}
+              height={44}
+              className="h-10 w-auto object-contain mix-blend-multiply"
+            />
           </div>
           <h1 className="mt-4 text-2xl font-bold text-slate-950">Call scheduled</h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             {selectedAdvisor.name} will review your brief before the call.
           </p>
         </section>
-        <section className="rounded-3xl border border-slate-200 bg-white p-4">
+        <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex gap-3">
             <div className="flex h-14 w-12 shrink-0 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
               <strong>21</strong>
@@ -271,7 +278,7 @@ export function AdvisorCallsApp() {
             <button className="h-11 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700">
               Add calendar
             </button>
-            <button onClick={() => setStep("home")} className="h-11 rounded-2xl bg-emerald-600 text-sm font-bold text-white">
+            <button onClick={() => setStep("home")} className="h-11 rounded-2xl bg-[#00a76f] text-sm font-bold text-white">
               Done
             </button>
           </div>
@@ -290,13 +297,13 @@ export function AdvisorCallsApp() {
               type="button"
               key={topic.id}
               onClick={() => setSelectedTopic(topic)}
-              className={`flex w-full items-center gap-3 rounded-3xl border p-4 text-left ${
+              className={`flex w-full items-center gap-3 rounded-3xl border p-4 text-left shadow-sm transition ${
                 selectedTopic.id === topic.id
-                  ? "border-emerald-600 bg-emerald-50"
+                  ? "border-[#00a76f] bg-[linear-gradient(135deg,#f1fff8,#eef7ff)]"
                   : "border-slate-200 bg-white"
               }`}
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-xs font-bold text-emerald-700">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-xs font-bold text-[#006bff] shadow-sm">
                 {topic.icon}
               </span>
               <span>
@@ -322,16 +329,16 @@ export function AdvisorCallsApp() {
           id="advisor-note"
           value={note}
           onChange={(event) => setNote(event.target.value)}
-          className="min-h-40 w-full resize-none rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-800 outline-none focus:border-emerald-500"
+          className="min-h-40 w-full resize-none rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-800 shadow-sm outline-none focus:border-[#00a76f]"
         />
         <div className="flex flex-wrap gap-2">
           {["Is my SIP enough?", "Should I redeem?", "How much tax?"].map((prompt) => (
-            <button key={prompt} type="button" className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600">
+            <button key={prompt} type="button" className="rounded-full border border-[#d7edf8] bg-white px-3 py-2 text-xs font-semibold text-[#006bff]">
               {prompt}
             </button>
           ))}
         </div>
-        <section className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-white p-4">
+        <section className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex justify-between gap-4 py-3 first:pt-0">
             <span className="text-sm text-slate-500">Goal</span>
             <strong className="text-right text-sm text-slate-900">Daughter&apos;s education</strong>
@@ -341,7 +348,7 @@ export function AdvisorCallsApp() {
             <strong className="text-right text-sm text-slate-900">Equity mutual funds</strong>
           </div>
         </section>
-        <section className="space-y-4 rounded-3xl border border-slate-200 bg-white p-4">
+        <section className="space-y-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <label className="flex items-center justify-between gap-4 text-sm font-bold text-slate-900">
             Include previous call summaries
             <input type="checkbox" checked={includeHistory} onChange={(event) => setIncludeHistory(event.target.checked)} />
@@ -360,10 +367,15 @@ export function AdvisorCallsApp() {
     return (
       <div className="space-y-5 px-4 pb-36">
         <StepHeader eyebrow="Step 3 of 5" title="Review what your advisor will see" progress={60} onBack={goBack} />
-        <section className="rounded-3xl border border-emerald-100 bg-emerald-50 p-4">
+        <section className="rounded-3xl border border-[#bcebdc] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_100%)] p-4 shadow-sm">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-bold text-slate-950">Advisor brief</h2>
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-emerald-700">Ready</span>
+            <div className="flex items-center gap-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-xs font-black text-[#00a76f] shadow-sm">
+                AI
+              </span>
+              <h2 className="font-bold text-slate-950">Advisor brief</h2>
+            </div>
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#00a76f]">Ready</span>
           </div>
           <p className="mt-3 text-sm leading-6 text-slate-700">{brief}</p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -374,7 +386,7 @@ export function AdvisorCallsApp() {
             ))}
           </div>
         </section>
-        <section className="rounded-3xl border border-slate-200 bg-white p-4">
+        <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <h2 className="font-bold text-slate-950">Prior context attached</h2>
           <div className="mt-3 space-y-3">
             {priorCalls.slice(0, includeHistory ? 2 : 0).map((call) => (
@@ -398,8 +410,8 @@ export function AdvisorCallsApp() {
     return (
       <div className="space-y-5 px-4 pb-36">
         <StepHeader eyebrow="Step 4 of 5" title="Choose who you want to speak with" progress={80} onBack={goBack} />
-        <button className="flex w-full items-center gap-3 rounded-3xl border border-emerald-600 bg-emerald-50 p-4 text-left">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white">
+        <button className="flex w-full items-center gap-3 rounded-3xl border border-[#00a76f] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] p-4 text-left shadow-sm">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#00c781,#006bff)] text-xs font-bold text-white">
             FI
           </span>
           <span className="min-w-0">
@@ -413,12 +425,12 @@ export function AdvisorCallsApp() {
               key={advisor.id}
               type="button"
               onClick={() => setSelectedAdvisor(advisor)}
-              className={`w-full rounded-3xl border p-4 text-left ${
-                selectedAdvisor.id === advisor.id ? "border-emerald-600 bg-emerald-50" : "border-slate-200 bg-white"
+              className={`w-full rounded-3xl border p-4 text-left shadow-sm ${
+                selectedAdvisor.id === advisor.id ? "border-[#00a76f] bg-[linear-gradient(135deg,#f5fffb,#f2f8ff)]" : "border-slate-200 bg-white"
               }`}
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#17202a,#006bff)] text-xs font-bold text-white">
                   {advisor.initials}
                 </span>
                 <span>
@@ -468,7 +480,7 @@ export function AdvisorCallsApp() {
               type="button"
               onClick={() => setSelectedDate(date)}
               className={`min-h-16 min-w-20 rounded-2xl border px-3 text-sm font-bold ${
-                selectedDate === date ? "border-emerald-600 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-700"
+                selectedDate === date ? "border-[#00a76f] bg-[#ecfff7] text-[#00a76f]" : "border-slate-200 bg-white text-slate-700"
               }`}
             >
               {date}
@@ -485,7 +497,7 @@ export function AdvisorCallsApp() {
                 type="button"
                 onClick={() => setSelectedSlot(slot)}
                 className={`h-12 rounded-2xl border text-sm font-bold ${
-                  selectedSlot === slot ? "border-emerald-600 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-700"
+                  selectedSlot === slot ? "border-[#006bff] bg-[#eef7ff] text-[#006bff]" : "border-slate-200 bg-white text-slate-700"
                 }`}
               >
                 {slot}
@@ -493,7 +505,7 @@ export function AdvisorCallsApp() {
             ))}
           </div>
         </section>
-        <section className="rounded-3xl border border-slate-200 bg-white p-4">
+        <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <p className="text-sm text-slate-500">Selected</p>
           <h2 className="mt-1 font-bold text-slate-950">
             {selectedDate} · {selectedSlot} with {selectedAdvisor.name}
@@ -509,16 +521,22 @@ export function AdvisorCallsApp() {
     return (
       <div className="space-y-5 px-4 pb-36">
         <StepHeader eyebrow="Confirm" title="Review and schedule" onBack={goBack} />
-        <section className="rounded-3xl bg-white p-5 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-3xl bg-emerald-50 text-sm font-bold text-emerald-700">
-            OK
+        <section className="rounded-3xl border border-emerald-100 bg-white p-5 text-center shadow-sm">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-[linear-gradient(135deg,#ecfff7,#eef7ff)]">
+            <Image
+              src="/fundsindia-logo.png"
+              alt="FundsIndia"
+              width={72}
+              height={38}
+              className="h-9 w-auto object-contain mix-blend-multiply"
+            />
           </div>
           <h2 className="mt-4 text-lg font-bold text-slate-950">Advisor is ready with your context</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             Your brief, related goal, and past conversation summaries will be attached.
           </p>
         </section>
-        <section className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-white p-4">
+        <section className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           {[
             ["Topic", selectedTopic.title],
             ["Advisor", selectedAdvisor.name],
@@ -539,22 +557,44 @@ export function AdvisorCallsApp() {
 
   return (
     <div className="space-y-6 px-4 pb-28">
-      <section className="rounded-3xl bg-emerald-50 p-5">
-        <p className="text-xs font-bold uppercase tracking-normal text-emerald-700">Advisor calls</p>
-        <h1 className="mt-1 text-2xl font-bold leading-tight text-slate-950">Get guidance with context already prepared</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
+      <section className="overflow-hidden rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
+        <div className="flex items-center justify-between gap-3">
+          <Image
+            src="/fundsindia-logo.png"
+            alt="FundsIndia"
+            width={132}
+            height={69}
+            className="h-10 w-auto object-contain mix-blend-multiply"
+          />
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#006bff] shadow-sm">Advisor ready</span>
+        </div>
+        <p className="mt-5 text-xs font-bold uppercase tracking-normal text-[#00a76f]">Advisor calls</p>
+        <h1 className="mt-1 text-3xl font-black leading-tight text-slate-950">Guidance with context already prepared</h1>
+        <p className="mt-3 text-sm leading-6 text-slate-600">
           Schedule a call for your portfolio, SIPs, goals, taxes, or redemptions. Your advisor sees the right
           context before the conversation starts.
         </p>
-        <button onClick={() => setStep("topic")} className="mt-4 h-11 rounded-full bg-emerald-600 px-5 text-sm font-bold text-white">
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          {[
+            ["₹46.8L", "Portfolio"],
+            ["4", "Goals"],
+            ["28d", "Last call"],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-2xl bg-white/80 p-3 shadow-sm">
+              <strong className="block text-sm text-slate-950">{value}</strong>
+              <span className="text-[11px] font-semibold text-slate-500">{label}</span>
+            </div>
+          ))}
+        </div>
+        <button onClick={() => setStep("topic")} className="mt-5 h-12 rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] px-5 text-sm font-bold text-white shadow-lg shadow-emerald-900/10">
           Schedule a call
         </button>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-4">
+      <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-950">Upcoming</h2>
-          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">Confirmed</span>
+          <span className="rounded-full bg-[#ecfff7] px-3 py-1 text-xs font-bold text-[#00a76f]">Confirmed</span>
         </div>
         <div className="flex gap-3">
           <div className="flex h-14 w-12 shrink-0 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
@@ -570,7 +610,7 @@ export function AdvisorCallsApp() {
           <button onClick={() => setStep("context")} className="h-11 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700">
             Add context
           </button>
-          <button onClick={() => setStep("detail")} className="h-11 rounded-2xl bg-emerald-600 text-sm font-bold text-white">
+          <button onClick={() => setStep("detail")} className="h-11 rounded-2xl bg-[#006bff] text-sm font-bold text-white">
             View details
           </button>
         </div>
@@ -586,9 +626,9 @@ export function AdvisorCallsApp() {
             setSelectedTopic(topics[1]);
             setStep("context");
           }}
-          className="flex w-full gap-3 rounded-3xl border border-slate-200 bg-white p-4 text-left"
+          className="flex w-full gap-3 rounded-3xl border border-[#d7edf8] bg-white p-4 text-left shadow-sm"
         >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-50 text-xs font-bold text-cyan-700">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-bold text-[#006bff]">
             SI
           </span>
           <span>
@@ -612,7 +652,7 @@ export function AdvisorCallsApp() {
             <button
               key={call.title}
               onClick={() => setStep("detail")}
-              className="w-full rounded-3xl border border-slate-200 bg-white p-4 text-left"
+              className="w-full rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm"
             >
               <strong className="block text-slate-950">{call.title}</strong>
               <span className="text-sm text-slate-500">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SummaryContext } from "@/lib/summary/summaryContext";
@@ -8,10 +9,10 @@ import { useWeeklySummary } from "@/lib/summary/useWeeklySummary";
 import { SidebarDrawer } from "./SidebarDrawer";
 
 const NAV_ITEMS = [
-  { label: "Home", href: "/dashboard", icon: "H" },
-  { label: "Funds", href: "/dashboard", icon: "F" },
-  { label: "Goals", href: "/dashboard", icon: "G" },
-  { label: "Advisor", href: "/advisor-calls", icon: "A" },
+  { label: "Home", href: "/dashboard", icon: "⌂" },
+  { label: "Funds", href: "/dashboard", icon: "₹" },
+  { label: "Goals", href: "/dashboard", icon: "◎" },
+  { label: "Advisor", href: "/advisor-calls", icon: "☎" },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -21,29 +22,35 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <SummaryContext.Provider value={{ openDescriptor: summary.openDescriptor, openToday: summary.openToday }}>
-      <div className="mx-auto flex min-h-full w-full max-w-md flex-col bg-slate-50 shadow-sm">
-        <header className="sticky top-0 z-20 flex items-center justify-between bg-slate-50/95 px-4 py-3 backdrop-blur">
+      <div className="mx-auto flex min-h-full w-full max-w-md flex-col bg-[#f4f8fb] shadow-sm">
+        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200/70 bg-white/95 px-4 py-3 backdrop-blur">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
             aria-label="Open menu"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-emerald-100 bg-[#ecfbf4] text-sm font-bold text-[#00a76f]"
           >
             RB
-            <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-slate-700 text-[8px] leading-none text-white">
-              =
-            </span>
+            <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-white bg-[#006bff]" />
           </button>
-          <div className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-normal text-emerald-700">FundsIndia</p>
-            <p className="text-[11px] text-slate-500">Guided investing</p>
+          <div className="flex flex-col items-center">
+            <Image
+              src="/fundsindia-logo.png"
+              alt="FundsIndia"
+              width={146}
+              height={76}
+              priority
+              className="h-9 w-auto object-contain mix-blend-multiply"
+            />
+            <p className="-mt-1 text-[10px] font-semibold text-slate-500">Guided mutual fund investing</p>
           </div>
           <button
             type="button"
             aria-label="Notifications"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-500"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-600 shadow-sm"
           >
             N
+            <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-[#00c781]" />
           </button>
         </header>
 
@@ -57,10 +64,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                 key={item.label}
                 href={item.href}
                 className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold ${
-                  active ? "bg-emerald-50 text-emerald-700" : "text-slate-500"
+                  active ? "bg-[#eaf8ff] text-[#006bff]" : "text-slate-500"
                 }`}
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full border border-current text-[10px]">
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full border text-[12px] ${
+                    active ? "border-[#00a76f] bg-white text-[#00a76f]" : "border-current"
+                  }`}
+                >
                   {item.icon}
                 </span>
                 {item.label}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { getUser } from "@/lib/data/repository";
 
@@ -30,19 +31,33 @@ export function SidebarDrawer({ open, onClose }: { open: boolean; onClose: () =>
       <aside
         className={`absolute left-0 top-0 h-full w-4/5 max-w-xs overflow-y-auto bg-white p-5 shadow-xl transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <h2 className="text-2xl font-bold text-slate-900">{user.name}</h2>
-        {/* Demo stub: the seed User type has no email field, so this is a fixed display value, not a data-layer gap. */}
-        <p className="text-sm text-slate-500">ritikbansal27.rb@gmail.com</p>
+        <div className="mb-6 rounded-3xl bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_58%,#ffffff_100%)] p-4">
+          <Image
+            src="/fundsindia-logo.png"
+            alt="FundsIndia"
+            width={160}
+            height={84}
+            className="h-10 w-auto object-contain mix-blend-multiply"
+          />
+          <h2 className="mt-4 text-2xl font-bold text-slate-900">{user.name}</h2>
+          {/* Demo stub: the seed User type has no email field, so this is a fixed display value, not a data-layer gap. */}
+          <p className="text-sm text-slate-500">ritikbansal27.rb@gmail.com</p>
+          <div className="mt-3 inline-flex rounded-full bg-white px-3 py-1 text-xs font-bold text-[#0071f2]">
+            Advisory access enabled
+          </div>
+        </div>
 
-        <nav className="mt-6 space-y-1">
+        <nav className="space-y-1">
           {WIRED.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={onClose}
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-800 hover:bg-slate-50"
+              className="flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold text-slate-800 hover:bg-[#f3faf7]"
             >
-              <span className="flex w-5 shrink-0 items-center justify-center text-base">{item.icon}</span>
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#eef8ff] text-xs font-bold text-[#006bff]">
+                {item.icon}
+              </span>
               {item.label}
             </Link>
           ))}
@@ -50,8 +65,10 @@ export function SidebarDrawer({ open, onClose }: { open: boolean; onClose: () =>
 
         <div className="mt-4 border-t border-slate-100 pt-4">
           {PLACEHOLDERS.map((item) => (
-            <div key={item.label} className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400">
-              <span className="flex w-5 shrink-0 items-center justify-center text-base">{item.icon}</span>
+            <div key={item.label} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-400">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-50 text-[10px] font-bold">
+                {item.icon}
+              </span>
               {item.label}
             </div>
           ))}
