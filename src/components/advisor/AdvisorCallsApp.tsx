@@ -3,99 +3,176 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
-type Step = "home" | "topic" | "context" | "brief" | "advisor" | "time" | "confirm" | "success" | "history" | "detail";
+type Step = "home" | "category" | "context" | "time" | "confirm" | "history" | "detail" | "briefing";
+type CategoryId = "portfolio_review" | "new_investment" | "miscellaneous";
+type TimeMode = "suggested" | "manual";
 
-type Topic = {
-  id: string;
+type Category = {
+  id: CategoryId;
   title: string;
   description: string;
+  placeholder: string;
   icon: string;
+  suggestedGoals: string[];
 };
 
-type Advisor = {
+type Goal = {
   id: string;
-  name: string;
-  specialty: string;
-  languages: string;
-  nextSlot: string;
-  initials: string;
+  label: string;
 };
 
-const topics: Topic[] = [
+type Slot = {
+  day: string;
+  date: string;
+  time: string;
+  note: string;
+};
+
+const assignedAdvisor = {
+  id: "rekha",
+  name: "Rekha Nair",
+  title: "Your FundsIndia advisor",
+  initials: "RN",
+  availability: "Usually responds within 1 business day",
+};
+
+const categories: Category[] = [
   {
-    id: "portfolio",
+    id: "portfolio_review",
     title: "Portfolio review",
-    description: "Check allocation, underperformers, and next steps.",
+    description: "Check how your investments are doing.",
+    placeholder: "e.g. I want to check if my SIPs still match my goals",
     icon: "PR",
+    suggestedGoals: ["education", "retirement"],
   },
   {
-    id: "sip",
-    title: "SIP increase",
-    description: "Discuss income changes and goal timelines.",
-    icon: "SI",
+    id: "new_investment",
+    title: "New investment",
+    description: "Put in new money or explore a new goal.",
+    placeholder: "e.g. I have some extra money and want to know where to put it",
+    icon: "NI",
+    suggestedGoals: ["wealth", "home"],
   },
   {
-    id: "tax",
-    title: "Tax or redemption",
-    description: "Understand exit load, capital gains, and cash needs.",
-    icon: "TX",
-  },
-  {
-    id: "family",
-    title: "Family goals",
-    description: "Coordinate spouse, children, and shared goals.",
-    icon: "FG",
-  },
-  {
-    id: "nri",
-    title: "NRI investing",
-    description: "Handle account rules, remittance, and India goals.",
-    icon: "NR",
+    id: "miscellaneous",
+    title: "Not sure — just let me explain",
+    description: "Start with your question. Rekha will help classify it.",
+    placeholder: "Tell us what's on your mind",
+    icon: "NS",
+    suggestedGoals: [],
   },
 ];
 
-const advisors: Advisor[] = [
-  {
-    id: "meera",
-    name: "Meera Iyer",
-    specialty: "Goal planning specialist",
-    languages: "English, Hindi",
-    nextSlot: "Today 11:30 AM",
-    initials: "MI",
-  },
-  {
-    id: "rohan",
-    name: "Rohan Menon",
-    specialty: "Tax and redemption specialist",
-    languages: "English, Malayalam",
-    nextSlot: "Tomorrow 2:00 PM",
-    initials: "RM",
-  },
+const goals: Goal[] = [
+  { id: "education", label: "Daughter's education" },
+  { id: "retirement", label: "Retirement" },
+  { id: "home", label: "Home down payment" },
+  { id: "wealth", label: "Long-term wealth" },
+  { id: "tax", label: "Tax planning" },
 ];
 
-const priorCalls = [
+const suggestedSlots: Slot[] = [
+  { day: "Today", date: "28 Jul", time: "4:30 PM", note: "Best fit" },
+  { day: "Wed", date: "29 Jul", time: "11:00 AM", note: "Good fit" },
+  { day: "Thu", date: "30 Jul", time: "2:30 PM", note: "Open after lunch" },
+  { day: "Fri", date: "31 Jul", time: "5:00 PM", note: "End of day" },
+];
+
+const manualDays = ["Today", "Wed", "Thu", "Fri", "Sat"];
+const manualSlotsByDay: Record<string, Slot[]> = {
+  Today: [
+    { day: "Today", date: "28 Jul", time: "4:30 PM", note: "Best fit" },
+    { day: "Today", date: "28 Jul", time: "6:00 PM", note: "Evening" },
+  ],
+  Wed: [
+    { day: "Wed", date: "29 Jul", time: "10:30 AM", note: "Morning" },
+    { day: "Wed", date: "29 Jul", time: "11:00 AM", note: "Good fit" },
+    { day: "Wed", date: "29 Jul", time: "3:00 PM", note: "Afternoon" },
+  ],
+  Thu: [
+    { day: "Thu", date: "30 Jul", time: "12:00 PM", note: "Midday" },
+    { day: "Thu", date: "30 Jul", time: "2:30 PM", note: "Open after lunch" },
+  ],
+  Fri: [
+    { day: "Fri", date: "31 Jul", time: "9:30 AM", note: "Early" },
+    { day: "Fri", date: "31 Jul", time: "5:00 PM", note: "End of day" },
+  ],
+  Sat: [{ day: "Sat", date: "1 Aug", time: "11:30 AM", note: "Weekend" }],
+};
+
+const pastCalls = [
   {
+    id: "education-review",
     date: "Jun 16",
+    advisor: assignedAdvisor.name,
+    category: "Portfolio review",
     title: "Education goal recalibration",
-    summary: "Discussed increasing SIP by ₹12,000 if bonus income becomes recurring.",
-    tag: "Follow-up due",
+    summary: "Reviewed whether SIPs still match the education goal after income changed.",
+    detail:
+      "Rekha suggested reviewing the education goal projection in July before increasing equity exposure. The investor wanted confidence that the current SIP path was still reasonable.",
+    action: "Review goal projection after salary revision settles.",
   },
   {
+    id: "liquidity-tax",
     date: "Apr 09",
+    advisor: assignedAdvisor.name,
+    category: "New investment",
     title: "Tax-saving funds and liquidity",
-    summary: "No redemption recommended because emergency fund was below target.",
-    tag: "ELSS",
+    summary: "Discussed ELSS lock-in versus near-term liquidity needs.",
+    detail:
+      "No redemption was recommended because the emergency fund was below target. Rekha suggested building liquidity before adding more locked-in tax-saving exposure.",
+    action: "Top up emergency fund before new ELSS allocation.",
   },
   {
+    id: "family-visibility",
     date: "Feb 21",
+    advisor: assignedAdvisor.name,
+    category: "Not sure",
     title: "Family account setup",
-    summary: "Explored spouse visibility for shared home down-payment tracking.",
-    tag: "Family goals",
+    summary: "Explored spouse visibility without combining ownership.",
+    detail:
+      "The investor wanted shared goal tracking for a home down payment while keeping ownership and transaction permissions separate.",
+    action: "Set up shared visibility once spouse profile is verified.",
   },
 ];
 
-const slots = ["10:00 AM", "11:30 AM", "2:00 PM", "4:30 PM", "6:00 PM"];
-const dates = ["Today", "Wed", "Thu", "Fri"];
+function categoryById(id: CategoryId) {
+  return categories.find((category) => category.id === id) ?? categories[0];
+}
+
+function AdvisorAvatar({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
+  const sizeClass = size === "lg" ? "h-16 w-16" : size === "sm" ? "h-11 w-11" : "h-14 w-14";
+
+  return (
+    <div
+      className={`${sizeClass} shrink-0 overflow-hidden rounded-full border-2 border-white bg-[linear-gradient(135deg,#00c781,#006bff)] shadow-sm`}
+      aria-label={`${assignedAdvisor.name} photo`}
+    >
+      <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_24%,#e8fff6_0_18%,transparent_19%),linear-gradient(180deg,#dff7ff_0_44%,#12335f_45%)] text-xs font-black text-white">
+        {assignedAdvisor.initials}
+      </div>
+    </div>
+  );
+}
+
+function AdvisorIdentityBlock({ compact = false }: { compact?: boolean }) {
+  return (
+    <section
+      className={`flex gap-3 rounded-3xl border border-[#c8eee1] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] shadow-sm ${
+        compact ? "p-3" : "p-4"
+      }`}
+    >
+      <AdvisorAvatar size={compact ? "sm" : "md"} />
+      <div className="min-w-0">
+        <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Assigned advisor</p>
+        <h2 className="font-bold text-slate-950">{assignedAdvisor.name}</h2>
+        <p className="mt-1 text-sm leading-5 text-slate-600">
+          Rekha already has your full history — just tell her what&apos;s on your mind.
+        </p>
+      </div>
+    </section>
+  );
+}
 
 function StepHeader({
   eyebrow,
@@ -114,13 +191,13 @@ function StepHeader({
         <button
           type="button"
           onClick={onBack}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-xl font-semibold text-slate-700"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-xl font-semibold text-slate-700 shadow-sm"
           aria-label="Go back"
         >
           ‹
         </button>
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-normal text-emerald-700">{eyebrow}</p>
+          <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">{eyebrow}</p>
           <h1 className="text-2xl font-bold leading-tight text-slate-950">{title}</h1>
         </div>
       </div>
@@ -133,13 +210,18 @@ function StepHeader({
   );
 }
 
-function BottomAction({ label, onClick }: { label: string; onClick: () => void }) {
+function BottomAction({ label, onClick, disabled = false }: { label: string; onClick: () => void; disabled?: boolean }) {
   return (
     <div className="fixed inset-x-0 bottom-20 z-30 mx-auto w-full max-w-md border-t border-slate-200 bg-white/95 p-4 backdrop-blur">
       <button
         type="button"
         onClick={onClick}
-        className="h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white shadow-lg shadow-emerald-900/10"
+        disabled={disabled}
+        className={`h-12 w-full rounded-2xl text-sm font-bold shadow-lg shadow-emerald-900/10 ${
+          disabled
+            ? "bg-slate-200 text-slate-400"
+            : "bg-[linear-gradient(90deg,#00a76f,#006bff)] text-white"
+        }`}
       >
         {label}
       </button>
@@ -149,42 +231,71 @@ function BottomAction({ label, onClick }: { label: string; onClick: () => void }
 
 export function AdvisorCallsApp() {
   const [step, setStep] = useState<Step>("home");
-  const [selectedTopic, setSelectedTopic] = useState(topics[0]);
-  const [note, setNote] = useState(
-    "I want to know if my current SIP is enough for my daughter's education goal. My salary increased recently and I am unsure whether to add more to equity funds or keep money in safer debt funds.",
+  const [categoryId, setCategoryId] = useState<CategoryId>("portfolio_review");
+  const [categoryEditorOpen, setCategoryEditorOpen] = useState(false);
+  const [topicText, setTopicText] = useState(
+    "I want to check if my SIPs still match my daughter's education goal after my salary increase.",
   );
-  const [includeHistory, setIncludeHistory] = useState(true);
-  const [sharePortfolio, setSharePortfolio] = useState(true);
-  const [selectedAdvisor, setSelectedAdvisor] = useState(advisors[0]);
-  const [selectedDate, setSelectedDate] = useState("Today");
-  const [selectedSlot, setSelectedSlot] = useState("11:30 AM");
-  const [calendarConnected, setCalendarConnected] = useState(false);
+  const [selectedGoalIds, setSelectedGoalIds] = useState<string[]>(["education", "retirement"]);
+  const [timeMode, setTimeMode] = useState<TimeMode>("suggested");
+  const [manualDay, setManualDay] = useState("Today");
+  const [selectedSlot, setSelectedSlot] = useState<Slot>(suggestedSlots[0]);
+  const [calendarConnected, setCalendarConnected] = useState(true);
+  const [topicExpanded, setTopicExpanded] = useState(false);
+  const [bookingCommitted, setBookingCommitted] = useState(false);
+  const [selectedPastCallId, setSelectedPastCallId] = useState(pastCalls[0].id);
 
-  const brief = useMemo(() => {
-    const firstSentence = note.trim().split(/[.!?]/)[0] || "The investor wants guidance before taking action";
-    const priorContext = includeHistory ? " Prior call summaries will be attached for context." : "";
-    return `Ritik needs help with ${selectedTopic.title.toLowerCase()}. Main concern: ${firstSentence}.${priorContext}`;
-  }, [includeHistory, note, selectedTopic.title]);
+  const category = categoryById(categoryId);
+  const selectedGoals = goals.filter((goal) => selectedGoalIds.includes(goal.id));
+  const topicIsValid = topicText.trim().length > 0;
+  const selectedPastCall = pastCalls.find((call) => call.id === selectedPastCallId) ?? pastCalls[0];
 
-  const goBack = () => {
-    const order: Step[] = ["home", "topic", "context", "brief", "advisor", "time", "confirm", "success"];
-    const currentIndex = order.indexOf(step);
-    setStep(currentIndex > 1 ? order[currentIndex - 1] : "home");
+  const advisorBrief = useMemo(() => {
+    const goalsText = selectedGoals.length ? selectedGoals.map((goal) => goal.label).join(", ") : "no specific goal tag";
+    return {
+      headline: `${category.title} call with ${assignedAdvisor.name}`,
+      summary: `Investor wants to discuss: ${topicText.trim() || "No topic added yet"}`,
+      context: `Category metadata: ${category.id}. Goal tags: ${goalsText}. Include recent call memory and portfolio snapshot before the call.`,
+    };
+  }, [category.id, category.title, selectedGoals, topicText]);
+
+  const chooseCategory = (nextCategoryId: CategoryId) => {
+    const nextCategory = categoryById(nextCategoryId);
+    setCategoryId(nextCategoryId);
+    setCategoryEditorOpen(false);
+    setSelectedGoalIds(nextCategory.suggestedGoals);
+    if (!topicText.trim()) {
+      setTopicText("");
+    }
+    setStep("context");
+  };
+
+  const toggleGoal = (goalId: string) => {
+    setSelectedGoalIds((current) =>
+      current.includes(goalId) ? current.filter((id) => id !== goalId) : [...current, goalId],
+    );
+  };
+
+  const scheduleFollowUp = () => {
+    setCategoryId("portfolio_review");
+    setSelectedGoalIds(["education"]);
+    setTopicText(`Follow up on ${selectedPastCall.title}: ${selectedPastCall.action}`);
+    setStep("context");
   };
 
   if (step === "history") {
     return (
       <div className="space-y-5 px-4 pb-28">
-        <StepHeader eyebrow="Memory" title="Previous advisor calls" onBack={() => setStep("home")} />
-        <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500">
-          Search summaries, topics, advisors
+        <StepHeader eyebrow="Call history" title="Past discussions with Rekha" onBack={() => setStep("home")} />
+        <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500 shadow-sm">
+          Search summaries, categories, or action items
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1">
-          {["All", "Goals", "Tax", "SIP"].map((filter, index) => (
+          {["All", "Portfolio review", "New investment", "Not sure"].map((filter, index) => (
             <span
               key={filter}
               className={`shrink-0 rounded-full px-3 py-2 text-xs font-semibold ${
-                index === 0 ? "bg-emerald-600 text-white" : "border border-slate-200 bg-white text-slate-600"
+                index === 0 ? "bg-[#006bff] text-white" : "border border-slate-200 bg-white text-slate-600"
               }`}
             >
               {filter}
@@ -192,19 +303,25 @@ export function AdvisorCallsApp() {
           ))}
         </div>
         <div className="space-y-3">
-          {priorCalls.map((call) => (
+          {pastCalls.map((call) => (
             <button
               type="button"
-              key={call.title}
-              onClick={() => setStep("detail")}
-              className="w-full rounded-3xl border border-slate-200 bg-white p-4 text-left"
+              key={call.id}
+              onClick={() => {
+                setSelectedPastCallId(call.id);
+                setStep("detail");
+              }}
+              className="w-full rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm"
             >
-              <p className="text-xs font-bold text-cyan-700">{call.date}</p>
-              <h2 className="mt-1 text-base font-bold text-slate-950">{call.title}</h2>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-bold text-[#006bff]">{call.date}</p>
+                <span className="rounded-full bg-[#ecfff7] px-3 py-1 text-xs font-bold text-[#00a76f]">
+                  {call.category}
+                </span>
+              </div>
+              <h2 className="mt-2 text-base font-bold text-slate-950">{call.title}</h2>
               <p className="mt-1 text-sm leading-6 text-slate-600">{call.summary}</p>
-              <span className="mt-3 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                {call.tag}
-              </span>
+              <p className="mt-3 text-xs font-semibold text-slate-500">Advisor: {call.advisor}</p>
             </button>
           ))}
         </div>
@@ -215,105 +332,104 @@ export function AdvisorCallsApp() {
   if (step === "detail") {
     return (
       <div className="space-y-5 px-4 pb-28">
-        <StepHeader eyebrow="Jun 16 · Meera Iyer" title="Education goal recalibration" onBack={() => setStep("history")} />
-        <section className="rounded-3xl border border-emerald-100 bg-emerald-50 p-4">
-          <h2 className="text-base font-bold text-slate-950">Summary</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-700">
-            Discussed increasing SIP by ₹12,000 if bonus income becomes recurring. Advisor suggested a risk review
-            before adding more equity.
-          </p>
-        </section>
-        <section className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-white p-4">
-          {[
-            ["Decision", "Wait for salary revision confirmation"],
-            ["Action item", "Review goal projection in July"],
-            ["Related goal", "Daughter's education"],
-          ].map(([label, value]) => (
-            <div key={label} className="flex justify-between gap-4 py-3 first:pt-0 last:pb-0">
-              <span className="text-sm text-slate-500">{label}</span>
-              <strong className="text-right text-sm text-slate-900">{value}</strong>
+        <StepHeader eyebrow={`${selectedPastCall.date} · ${selectedPastCall.advisor}`} title={selectedPastCall.title} onBack={() => setStep("history")} />
+        <section className="rounded-3xl border border-[#bcebdc] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <AdvisorAvatar size="sm" />
+            <div>
+              <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">AI summary</p>
+              <h2 className="font-bold text-slate-950">{selectedPastCall.category}</h2>
             </div>
-          ))}
+          </div>
+          <p className="mt-3 text-sm leading-6 text-slate-700">{selectedPastCall.detail}</p>
         </section>
-        <button className="h-12 w-full rounded-2xl bg-emerald-600 text-sm font-bold text-white">Schedule follow-up</button>
-        <button className="h-12 w-full rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700">
-          Download summary
+        <section className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex justify-between gap-4 py-3 first:pt-0">
+            <span className="text-sm text-slate-500">Key point</span>
+            <strong className="text-right text-sm text-slate-900">{selectedPastCall.summary}</strong>
+          </div>
+          <div className="flex justify-between gap-4 py-3 last:pb-0">
+            <span className="text-sm text-slate-500">Action item</span>
+            <strong className="text-right text-sm text-slate-900">{selectedPastCall.action}</strong>
+          </div>
+        </section>
+        <button onClick={scheduleFollowUp} className="h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white">
+          Schedule follow-up
         </button>
       </div>
     );
   }
 
-  if (step === "success") {
+  if (step === "briefing") {
     return (
       <div className="space-y-5 px-4 pb-28">
-        <section className="mt-8 overflow-hidden rounded-3xl border border-emerald-100 bg-white p-6 text-center shadow-sm">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[28px] bg-[linear-gradient(135deg,#ecfff7,#eef7ff)]">
-            <Image
-              src="/fundsindia-logo.png"
-              alt="FundsIndia"
-              width={84}
-              height={44}
-              className="h-10 w-auto object-contain mix-blend-multiply"
-            />
+        <StepHeader eyebrow="Advisor briefing" title="Prepared for Rekha" onBack={() => setStep("home")} />
+        <AdvisorIdentityBlock compact />
+        <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Investor profile snapshot</p>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {[
+              ["₹46.8L", "Portfolio"],
+              ["₹62K", "SIP"],
+              ["Moderate", "Risk"],
+            ].map(([value, label]) => (
+              <div key={label} className="rounded-2xl bg-slate-50 p-3">
+                <strong className="block text-sm text-slate-950">{value}</strong>
+                <span className="text-[11px] font-semibold text-slate-500">{label}</span>
+              </div>
+            ))}
           </div>
-          <h1 className="mt-4 text-2xl font-bold text-slate-950">Call scheduled</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            {selectedAdvisor.name} will review your brief before the call.
-          </p>
+        </section>
+        <section className="rounded-3xl border border-[#bcebdc] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] p-4 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">This booking</p>
+          <h2 className="mt-1 font-bold text-slate-950">{advisorBrief.headline}</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-700">{advisorBrief.summary}</p>
+          <p className="mt-3 text-sm leading-6 text-slate-600">{advisorBrief.context}</p>
         </section>
         <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex gap-3">
-            <div className="flex h-14 w-12 shrink-0 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
-              <strong>21</strong>
-              <span className="text-xs text-slate-500">Jul</span>
-            </div>
-            <div>
-              <h2 className="font-bold text-slate-950">{selectedTopic.title}</h2>
-              <p className="text-sm text-slate-500">
-                {selectedSlot} · {selectedAdvisor.name}
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <button className="h-11 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700">
-              Add calendar
-            </button>
-            <button onClick={() => setStep("home")} className="h-11 rounded-2xl bg-[#00a76f] text-sm font-bold text-white">
-              Done
-            </button>
+          <h2 className="font-bold text-slate-950">Relevant past calls</h2>
+          <div className="mt-3 space-y-3">
+            {pastCalls.slice(0, 2).map((call) => (
+              <div key={call.id} className="rounded-2xl bg-slate-50 p-3">
+                <p className="text-xs font-bold text-[#006bff]">{call.date}</p>
+                <p className="mt-1 text-sm font-bold text-slate-900">{call.title}</p>
+                <p className="mt-1 text-xs leading-5 text-slate-600">{call.summary}</p>
+              </div>
+            ))}
           </div>
         </section>
+        <div className="grid grid-cols-2 gap-3">
+          <button className="h-12 rounded-2xl bg-[#006bff] text-sm font-bold text-white">Start call</button>
+          <button className="h-12 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700">
+            Add note
+          </button>
+        </div>
       </div>
     );
   }
 
-  if (step === "topic") {
+  if (step === "category") {
     return (
-      <div className="space-y-5 px-4 pb-36">
-        <StepHeader eyebrow="Step 1 of 5" title="What do you need help with?" progress={20} onBack={goBack} />
+      <div className="space-y-5 px-4 pb-28">
+        <StepHeader eyebrow="Page 1 of 4" title="What's this about?" progress={25} onBack={() => setStep("home")} />
         <div className="space-y-3">
-          {topics.map((topic) => (
+          {categories.map((item) => (
             <button
+              key={item.id}
               type="button"
-              key={topic.id}
-              onClick={() => setSelectedTopic(topic)}
-              className={`flex w-full items-center gap-3 rounded-3xl border p-4 text-left shadow-sm transition ${
-                selectedTopic.id === topic.id
-                  ? "border-[#00a76f] bg-[linear-gradient(135deg,#f1fff8,#eef7ff)]"
-                  : "border-slate-200 bg-white"
-              }`}
+              onClick={() => chooseCategory(item.id)}
+              className="flex w-full items-center gap-3 rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm"
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-xs font-bold text-[#006bff] shadow-sm">
-                {topic.icon}
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-black text-[#006bff]">
+                {item.icon}
               </span>
               <span>
-                <strong className="block text-slate-950">{topic.title}</strong>
-                <small className="mt-1 block text-sm leading-5 text-slate-500">{topic.description}</small>
+                <strong className="block text-slate-950">{item.title}</strong>
+                <small className="mt-1 block text-sm leading-5 text-slate-500">{item.description}</small>
               </span>
             </button>
           ))}
         </div>
-        <BottomAction label="Continue" onClick={() => setStep("context")} />
       </div>
     );
   }
@@ -321,236 +437,311 @@ export function AdvisorCallsApp() {
   if (step === "context") {
     return (
       <div className="space-y-5 px-4 pb-36">
-        <StepHeader eyebrow="Step 2 of 5" title="Tell your advisor what is on your mind" progress={40} onBack={goBack} />
-        <label className="block text-sm font-bold text-slate-900" htmlFor="advisor-note">
-          Investor note
+        <StepHeader eyebrow="Page 2 of 4" title="Tell Rekha what is on your mind" progress={50} onBack={() => setStep("category")} />
+
+        <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-[#ecfff7] px-3 py-2 text-xs font-bold text-[#00a76f]">
+              {category.title}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCategoryEditorOpen((open) => !open)}
+              className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600"
+            >
+              Change
+            </button>
+            <button
+              type="button"
+              onClick={() => setCategoryId("miscellaneous")}
+              className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-500"
+              aria-label="Remove category"
+            >
+              ×
+            </button>
+          </div>
+          {categoryEditorOpen ? (
+            <div className="mt-3 grid gap-2">
+              {categories.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => chooseCategory(item.id)}
+                  className={`rounded-2xl border px-3 py-3 text-left text-sm font-bold ${
+                    item.id === categoryId ? "border-[#00a76f] bg-[#ecfff7] text-[#00a76f]" : "border-slate-200 bg-slate-50 text-slate-700"
+                  }`}
+                >
+                  {item.title}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </section>
+
+        <AdvisorIdentityBlock />
+
+        <label className="block text-sm font-bold text-slate-900" htmlFor="topic-text">
+          What would you like to discuss?
         </label>
         <textarea
-          id="advisor-note"
-          value={note}
-          onChange={(event) => setNote(event.target.value)}
-          className="min-h-40 w-full resize-none rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-800 shadow-sm outline-none focus:border-[#00a76f]"
+          id="topic-text"
+          value={topicText}
+          onChange={(event) => setTopicText(event.target.value)}
+          placeholder={category.placeholder}
+          className="min-h-44 w-full resize-none rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-800 shadow-sm outline-none focus:border-[#00a76f]"
         />
-        <div className="flex flex-wrap gap-2">
-          {["Is my SIP enough?", "Should I redeem?", "How much tax?"].map((prompt) => (
-            <button key={prompt} type="button" className="rounded-full border border-[#d7edf8] bg-white px-3 py-2 text-xs font-semibold text-[#006bff]">
-              {prompt}
-            </button>
-          ))}
-        </div>
-        <section className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex justify-between gap-4 py-3 first:pt-0">
-            <span className="text-sm text-slate-500">Goal</span>
-            <strong className="text-right text-sm text-slate-900">Daughter&apos;s education</strong>
-          </div>
-          <div className="flex justify-between gap-4 py-3">
-            <span className="text-sm text-slate-500">Portfolio area</span>
-            <strong className="text-right text-sm text-slate-900">Equity mutual funds</strong>
-          </div>
-        </section>
-        <section className="space-y-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <label className="flex items-center justify-between gap-4 text-sm font-bold text-slate-900">
-            Include previous call summaries
-            <input type="checkbox" checked={includeHistory} onChange={(event) => setIncludeHistory(event.target.checked)} />
-          </label>
-          <label className="flex items-center justify-between gap-4 text-sm font-bold text-slate-900">
-            Share portfolio snapshot
-            <input type="checkbox" checked={sharePortfolio} onChange={(event) => setSharePortfolio(event.target.checked)} />
-          </label>
-        </section>
-        <BottomAction label="Create advisor brief" onClick={() => setStep("brief")} />
-      </div>
-    );
-  }
+        {!topicIsValid ? <p className="text-sm font-semibold text-rose-600">Add a short note before continuing.</p> : null}
 
-  if (step === "brief") {
-    return (
-      <div className="space-y-5 px-4 pb-36">
-        <StepHeader eyebrow="Step 3 of 5" title="Review what your advisor will see" progress={60} onBack={goBack} />
-        <section className="rounded-3xl border border-[#bcebdc] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_100%)] p-4 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-xs font-black text-[#00a76f] shadow-sm">
-                AI
-              </span>
-              <h2 className="font-bold text-slate-950">Advisor brief</h2>
-            </div>
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#00a76f]">Ready</span>
+        <section>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-950">Optional goal tags</h2>
+            <span className="text-xs font-semibold text-slate-500">Multi-select</span>
           </div>
-          <p className="mt-3 text-sm leading-6 text-slate-700">{brief}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {["Education goal", "SIP adequacy", "Income change", "Risk comfort"].map((tag) => (
-              <span key={tag} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </section>
-        <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <h2 className="font-bold text-slate-950">Prior context attached</h2>
-          <div className="mt-3 space-y-3">
-            {priorCalls.slice(0, includeHistory ? 2 : 0).map((call) => (
-              <div key={call.title} className="flex justify-between gap-4 border-t border-slate-100 pt-3 first:border-0 first:pt-0">
-                <span className="text-sm text-cyan-700">{call.date}</span>
-                <strong className="text-right text-sm text-slate-900">{call.title}</strong>
-              </div>
-            ))}
-            {!includeHistory ? <p className="text-sm text-slate-500">Prior call summaries are not included.</p> : null}
+          <div className="flex flex-wrap gap-2">
+            {goals.map((goal) => {
+              const selected = selectedGoalIds.includes(goal.id);
+              return (
+                <button
+                  key={goal.id}
+                  type="button"
+                  onClick={() => toggleGoal(goal.id)}
+                  className={`rounded-full border px-3 py-2 text-xs font-bold ${
+                    selected ? "border-[#006bff] bg-[#eef7ff] text-[#006bff]" : "border-slate-200 bg-white text-slate-600"
+                  }`}
+                >
+                  {goal.label}
+                </button>
+              );
+            })}
           </div>
         </section>
-        <button onClick={() => setStep("context")} className="h-12 w-full rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700">
-          Edit brief
-        </button>
-        <BottomAction label="Continue" onClick={() => setStep("advisor")} />
-      </div>
-    );
-  }
 
-  if (step === "advisor") {
-    return (
-      <div className="space-y-5 px-4 pb-36">
-        <StepHeader eyebrow="Step 4 of 5" title="Choose who you want to speak with" progress={80} onBack={goBack} />
-        <button className="flex w-full items-center gap-3 rounded-3xl border border-[#00a76f] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] p-4 text-left shadow-sm">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#00c781,#006bff)] text-xs font-bold text-white">
-            FI
-          </span>
-          <span className="min-w-0">
-            <strong className="block text-slate-950">Best available advisor</strong>
-            <small className="block text-sm text-slate-600">Fastest conflict-free slot for this topic</small>
-          </span>
-        </button>
-        <div className="space-y-3">
-          {advisors.map((advisor) => (
-            <button
-              key={advisor.id}
-              type="button"
-              onClick={() => setSelectedAdvisor(advisor)}
-              className={`w-full rounded-3xl border p-4 text-left shadow-sm ${
-                selectedAdvisor.id === advisor.id ? "border-[#00a76f] bg-[linear-gradient(135deg,#f5fffb,#f2f8ff)]" : "border-slate-200 bg-white"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#17202a,#006bff)] text-xs font-bold text-white">
-                  {advisor.initials}
-                </span>
-                <span>
-                  <strong className="block text-slate-950">{advisor.name}</strong>
-                  <small className="text-sm text-slate-500">{advisor.specialty}</small>
-                </span>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600">{advisor.languages}</span>
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600">Next: {advisor.nextSlot}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-        <BottomAction label="Choose time" onClick={() => setStep("time")} />
+        <BottomAction label="Continue" disabled={!topicIsValid} onClick={() => topicIsValid && setStep("time")} />
       </div>
     );
   }
 
   if (step === "time") {
+    const visibleManualSlots = manualSlotsByDay[manualDay] ?? [];
+
     return (
       <div className="space-y-5 px-4 pb-36">
-        <StepHeader eyebrow="Step 5 of 5" title="Pick a conflict-free time" progress={100} onBack={goBack} />
-        <button
-          type="button"
-          onClick={() => setCalendarConnected((connected) => !connected)}
-          className="flex w-full gap-3 rounded-3xl border border-amber-200 bg-amber-50 p-4 text-left"
-        >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-xs font-bold text-cyan-700">
-            G
-          </span>
-          <span>
-            <strong className="block text-slate-950">
-              {calendarConnected ? "Google Calendar connected" : "Connect Google Calendar"}
-            </strong>
-            <small className="mt-1 block text-sm leading-5 text-slate-600">
-              {calendarConnected
-                ? "Showing slots that avoid investor and advisor conflicts."
-                : "Suggest times that avoid conflicts for you and the advisor."}
-            </small>
-          </span>
-        </button>
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {dates.map((date) => (
+        <StepHeader eyebrow="Page 3 of 4" title="Find a time with Rekha" progress={75} onBack={() => setStep("context")} />
+        <AdvisorIdentityBlock compact />
+
+        {!calendarConnected ? (
+          <section className="rounded-3xl border border-[#d7edf8] bg-white p-5 shadow-sm">
+            <div className="flex gap-3">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-black text-[#006bff]">
+                G
+              </span>
+              <div>
+                <h2 className="font-bold text-slate-950">Connect your calendar</h2>
+                <p className="mt-1 text-sm leading-5 text-slate-600">
+                  FundsIndia can suggest times that work for you and Rekha.
+                </p>
+              </div>
+            </div>
             <button
-              key={date}
               type="button"
-              onClick={() => setSelectedDate(date)}
-              className={`min-h-16 min-w-20 rounded-2xl border px-3 text-sm font-bold ${
-                selectedDate === date ? "border-[#00a76f] bg-[#ecfff7] text-[#00a76f]" : "border-slate-200 bg-white text-slate-700"
-              }`}
+              onClick={() => setCalendarConnected(true)}
+              className="mt-4 h-11 w-full rounded-2xl bg-[#006bff] text-sm font-bold text-white"
             >
-              {date}
-              <span className="block text-xs font-medium text-slate-500">Jul</span>
+              Connect calendar
             </button>
-          ))}
-        </div>
-        <section>
-          <h2 className="mb-3 text-base font-bold text-slate-950">Available slots</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {slots.map((slot) => (
+          </section>
+        ) : timeMode === "suggested" ? (
+          <>
+            <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">AI suggested</p>
+                  <h2 className="font-bold text-slate-950">Recommended slots</h2>
+                </div>
+                <span className="rounded-full bg-[#ecfff7] px-3 py-1 text-xs font-bold text-[#00a76f]">
+                  Synced
+                </span>
+              </div>
+              <p className="mt-2 text-sm leading-5 text-slate-600">
+                Based on your calendar and {assignedAdvisor.name}&apos;s availability.
+              </p>
+              <div className="mt-4 grid gap-3">
+                {suggestedSlots.map((slot) => {
+                  const selected = selectedSlot.day === slot.day && selectedSlot.time === slot.time;
+                  return (
+                    <button
+                      key={`${slot.day}-${slot.time}`}
+                      type="button"
+                      onClick={() => setSelectedSlot(slot)}
+                      className={`flex items-center justify-between rounded-2xl border p-3 text-left ${
+                        selected ? "border-[#006bff] bg-[#eef7ff]" : "border-slate-200 bg-white"
+                      }`}
+                    >
+                      <span>
+                        <strong className="block text-slate-950">
+                          {slot.day}, {slot.time}
+                        </strong>
+                        <small className="text-sm text-slate-500">{slot.date}</small>
+                      </span>
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#006bff]">{slot.note}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+            <button
+              type="button"
+              onClick={() => setTimeMode("manual")}
+              className="h-12 w-full rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm"
+            >
+              Pick a different time
+            </button>
+          </>
+        ) : (
+          <>
+            <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Manual fallback</p>
+                  <h2 className="font-bold text-slate-950">Choose another available slot</h2>
+                </div>
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {manualDays.map((day) => (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => setManualDay(day)}
+                    className={`min-h-16 min-w-20 rounded-2xl border px-3 text-sm font-bold ${
+                      manualDay === day ? "border-[#00a76f] bg-[#ecfff7] text-[#00a76f]" : "border-slate-200 bg-white text-slate-700"
+                    }`}
+                  >
+                    {day}
+                    <span className="block text-xs font-medium text-slate-500">
+                      {manualSlotsByDay[day]?.[0]?.date.replace(/^\w+\s/, "") ?? "Jul"}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <div className="mt-4 grid gap-3">
+                {visibleManualSlots.map((slot) => {
+                  const selected = selectedSlot.day === slot.day && selectedSlot.time === slot.time;
+                  return (
+                    <button
+                      key={`${slot.day}-${slot.time}`}
+                      type="button"
+                      onClick={() => setSelectedSlot(slot)}
+                      className={`flex items-center justify-between rounded-2xl border p-3 text-left ${
+                        selected ? "border-[#006bff] bg-[#eef7ff]" : "border-slate-200 bg-white"
+                      }`}
+                    >
+                      <span>
+                        <strong className="block text-slate-950">{slot.time}</strong>
+                        <small className="text-sm text-slate-500">{slot.note}</small>
+                      </span>
+                      {selected ? <span className="text-xs font-bold text-[#006bff]">Selected</span> : null}
+                    </button>
+                  );
+                })}
+              </div>
               <button
-                key={slot}
                 type="button"
-                onClick={() => setSelectedSlot(slot)}
-                className={`h-12 rounded-2xl border text-sm font-bold ${
-                  selectedSlot === slot ? "border-[#006bff] bg-[#eef7ff] text-[#006bff]" : "border-slate-200 bg-white text-slate-700"
-                }`}
+                onClick={() => setCalendarConnected(true)}
+                className="mt-4 text-sm font-bold text-[#006bff]"
               >
-                {slot}
+                Not seeing enough slots? Sync your calendar
               </button>
-            ))}
-          </div>
-        </section>
-        <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-sm text-slate-500">Selected</p>
-          <h2 className="mt-1 font-bold text-slate-950">
-            {selectedDate} · {selectedSlot} with {selectedAdvisor.name}
-          </h2>
-          <p className="mt-1 text-sm text-slate-500">30 min phone call · IST</p>
-        </section>
-        <BottomAction label="Review booking" onClick={() => setStep("confirm")} />
+            </section>
+            <button
+              type="button"
+              onClick={() => setTimeMode("suggested")}
+              className="h-12 w-full rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm"
+            >
+              Back to suggested times
+            </button>
+          </>
+        )}
+
+        <BottomAction label="Confirm booking" onClick={() => setStep("confirm")} />
       </div>
     );
   }
 
   if (step === "confirm") {
+    const visibleTopic = topicExpanded || topicText.length <= 92 ? topicText : `${topicText.slice(0, 92)}...`;
+
     return (
-      <div className="space-y-5 px-4 pb-36">
-        <StepHeader eyebrow="Confirm" title="Review and schedule" onBack={goBack} />
-        <section className="rounded-3xl border border-emerald-100 bg-white p-5 text-center shadow-sm">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-[linear-gradient(135deg,#ecfff7,#eef7ff)]">
-            <Image
-              src="/fundsindia-logo.png"
-              alt="FundsIndia"
-              width={72}
-              height={38}
-              className="h-9 w-auto object-contain mix-blend-multiply"
-            />
-          </div>
-          <h2 className="mt-4 text-lg font-bold text-slate-950">Advisor is ready with your context</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            Your brief, related goal, and past conversation summaries will be attached.
-          </p>
-        </section>
-        <section className="divide-y divide-slate-100 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          {[
-            ["Topic", selectedTopic.title],
-            ["Advisor", selectedAdvisor.name],
-            ["Time", `${selectedDate}, ${selectedSlot}`],
-            ["Calendar", calendarConnected ? "Connected" : "Not connected"],
-            ["Portfolio snapshot", sharePortfolio ? "Shared" : "Not shared"],
-          ].map(([label, value]) => (
-            <div key={label} className="flex justify-between gap-4 py-3 first:pt-0 last:pb-0">
-              <span className="text-sm text-slate-500">{label}</span>
-              <strong className="text-right text-sm text-slate-900">{value}</strong>
+      <div className="space-y-5 px-4 pb-28">
+        <StepHeader eyebrow="Page 4 of 4" title="Confirm your call" progress={100} onBack={() => setStep("time")} />
+        <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex gap-3">
+            <AdvisorAvatar size="md" />
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Call with</p>
+              <h2 className="font-bold text-slate-950">{assignedAdvisor.name}</h2>
+              <p className="text-sm text-slate-500">{selectedSlot.day}, {selectedSlot.date} · {selectedSlot.time}</p>
             </div>
-          ))}
+          </div>
+          <div className="mt-4 divide-y divide-slate-100">
+            <div className="flex justify-between gap-4 py-3">
+              <span className="text-sm text-slate-500">Category</span>
+              <strong className="text-right text-sm text-slate-900">{category.title}</strong>
+            </div>
+            <div className="py-3">
+              <div className="flex items-start justify-between gap-4">
+                <span className="text-sm text-slate-500">Your note</span>
+                <p className="max-w-[210px] text-right text-sm font-bold leading-5 text-slate-900">{visibleTopic}</p>
+              </div>
+              {topicText.length > 92 ? (
+                <button
+                  type="button"
+                  onClick={() => setTopicExpanded((expanded) => !expanded)}
+                  className="mt-2 text-sm font-bold text-[#006bff]"
+                >
+                  {topicExpanded ? "Show less" : "Read full note"}
+                </button>
+              ) : null}
+            </div>
+            <div className="flex justify-between gap-4 py-3">
+              <span className="text-sm text-slate-500">Goal tags</span>
+              <strong className="text-right text-sm text-slate-900">
+                {selectedGoals.length ? selectedGoals.map((goal) => goal.label).join(", ") : "None"}
+              </strong>
+            </div>
+          </div>
         </section>
-        <BottomAction label="Schedule call" onClick={() => setStep("success")} />
+        <section className="rounded-3xl border border-[#bcebdc] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] p-4 shadow-sm">
+          <p className="text-sm leading-6 text-slate-700">
+            {assignedAdvisor.name} will review your notes and recent call history before the call.
+          </p>
+          <p className="mt-2 text-sm font-semibold text-[#00a76f]">Calendar event added to your synced calendar.</p>
+        </section>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => setStep("context")}
+            className="h-12 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm"
+          >
+            Edit details
+          </button>
+          <button
+            type="button"
+            onClick={() => setStep("time")}
+            className="h-12 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm"
+          >
+            Change time
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setBookingCommitted(true);
+            setStep("home");
+          }}
+          className="h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white shadow-lg shadow-emerald-900/10"
+        >
+          Done
+        </button>
       </div>
     );
   }
@@ -569,49 +760,40 @@ export function AdvisorCallsApp() {
           <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#006bff] shadow-sm">Advisor ready</span>
         </div>
         <p className="mt-5 text-xs font-bold uppercase tracking-normal text-[#00a76f]">Advisor calls</p>
-        <h1 className="mt-1 text-3xl font-black leading-tight text-slate-950">Guidance with context already prepared</h1>
+        <h1 className="mt-1 text-3xl font-black leading-tight text-slate-950">Talk to your advisor</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Schedule a call for your portfolio, SIPs, goals, taxes, or redemptions. Your advisor sees the right
-          context before the conversation starts.
+          Rekha already knows your portfolio, goals, and past conversations. Tell her what feels unclear and pick a time.
         </p>
-        <div className="mt-5 grid grid-cols-3 gap-2">
-          {[
-            ["₹46.8L", "Portfolio"],
-            ["4", "Goals"],
-            ["28d", "Last call"],
-          ].map(([value, label]) => (
-            <div key={label} className="rounded-2xl bg-white/80 p-3 shadow-sm">
-              <strong className="block text-sm text-slate-950">{value}</strong>
-              <span className="text-[11px] font-semibold text-slate-500">{label}</span>
-            </div>
-          ))}
-        </div>
-        <button onClick={() => setStep("topic")} className="mt-5 h-12 rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] px-5 text-sm font-bold text-white shadow-lg shadow-emerald-900/10">
-          Schedule a call
+        <button onClick={() => setStep("category")} className="mt-5 h-12 rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] px-5 text-sm font-bold text-white shadow-lg shadow-emerald-900/10">
+          Talk to your advisor
         </button>
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-950">Upcoming</h2>
-          <span className="rounded-full bg-[#ecfff7] px-3 py-1 text-xs font-bold text-[#00a76f]">Confirmed</span>
+          <h2 className="text-lg font-bold text-slate-950">Upcoming calls</h2>
+          <button onClick={() => setStep("history")} className="text-sm font-bold text-slate-500">
+            History
+          </button>
         </div>
         <div className="flex gap-3">
           <div className="flex h-14 w-12 shrink-0 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
-            <strong>21</strong>
+            <strong>{bookingCommitted ? "28" : "21"}</strong>
             <span className="text-xs text-slate-500">Jul</span>
           </div>
-          <div>
-            <h3 className="font-bold text-slate-950">Education goal review</h3>
-            <p className="text-sm text-slate-500">11:30 AM · Meera Iyer</p>
+          <div className="min-w-0">
+            <h3 className="font-bold text-slate-950">{bookingCommitted ? category.title : "Education goal review"}</h3>
+            <p className="text-sm text-slate-500">
+              {bookingCommitted ? selectedSlot.time : "11:30 AM"} · {assignedAdvisor.name}
+            </p>
           </div>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <button onClick={() => setStep("context")} className="h-11 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700">
             Add context
           </button>
-          <button onClick={() => setStep("detail")} className="h-11 rounded-2xl bg-[#006bff] text-sm font-bold text-white">
-            View details
+          <button onClick={() => setStep("briefing")} className="h-11 rounded-2xl bg-[#006bff] text-sm font-bold text-white">
+            Advisor brief
           </button>
         </div>
       </section>
@@ -619,22 +801,24 @@ export function AdvisorCallsApp() {
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-950">Suggested for you</h2>
-          <span className="text-sm text-slate-500">Based on goals</span>
+          <span className="text-sm text-slate-500">Contextual trigger</span>
         </div>
         <button
           onClick={() => {
-            setSelectedTopic(topics[1]);
+            setCategoryId("portfolio_review");
+            setSelectedGoalIds(["education"]);
+            setTopicText("I want to talk through whether my current SIP still matches my daughter's education goal.");
             setStep("context");
           }}
           className="flex w-full gap-3 rounded-3xl border border-[#d7edf8] bg-white p-4 text-left shadow-sm"
         >
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-bold text-[#006bff]">
-            SI
+            SIP
           </span>
           <span>
-            <strong className="block text-slate-950">Salary increased recently?</strong>
+            <strong className="block text-slate-950">Want to talk this through with Rekha first?</strong>
             <small className="mt-1 block text-sm leading-5 text-slate-600">
-              Review whether your SIP should change for your daughter&apos;s education goal.
+              Your SIP is close to the education goal plan. Ask Rekha before changing it.
             </small>
           </span>
         </button>
@@ -642,21 +826,29 @@ export function AdvisorCallsApp() {
 
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-950">Recent conversations</h2>
+          <h2 className="text-lg font-bold text-slate-950">Recent discussions</h2>
           <button onClick={() => setStep("history")} className="text-sm font-bold text-slate-500">
             View all
           </button>
         </div>
         <div className="space-y-3">
-          {priorCalls.slice(0, 2).map((call) => (
+          {pastCalls.slice(0, 2).map((call) => (
             <button
-              key={call.title}
-              onClick={() => setStep("detail")}
+              key={call.id}
+              onClick={() => {
+                setSelectedPastCallId(call.id);
+                setStep("detail");
+              }}
               className="w-full rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm"
             >
-              <strong className="block text-slate-950">{call.title}</strong>
-              <span className="text-sm text-slate-500">
-                {call.date} · {call.tag}
+              <div className="flex items-center justify-between gap-3">
+                <strong className="block text-slate-950">{call.title}</strong>
+                <span className="shrink-0 rounded-full bg-[#ecfff7] px-2 py-1 text-[11px] font-bold text-[#00a76f]">
+                  {call.category}
+                </span>
+              </div>
+              <span className="mt-1 block text-sm text-slate-500">
+                {call.date} · {call.summary}
               </span>
             </button>
           ))}
