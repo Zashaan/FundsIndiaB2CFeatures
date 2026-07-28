@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Step = "home" | "category" | "context" | "time" | "confirm" | "history" | "detail" | "briefing";
 type CategoryId = "portfolio_review" | "new_investment" | "miscellaneous";
@@ -244,6 +244,23 @@ export function AdvisorCallsApp() {
   const [topicExpanded, setTopicExpanded] = useState(false);
   const [bookingCommitted, setBookingCommitted] = useState(false);
   const [selectedPastCallId, setSelectedPastCallId] = useState(pastCalls[0].id);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const goalName = params.get("goalName");
+    const categoryParam = params.get("category");
+
+    if (!goalName) return;
+
+    const timeout = window.setTimeout(() => {
+      setCategoryId(categoryParam === "new_investment" ? "new_investment" : "portfolio_review");
+      setSelectedGoalIds(["wealth"]);
+      setTopicText(`I created a goal for ${goalName} and want to talk through the right investment plan with Rekha.`);
+      setStep("context");
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   const category = categoryById(categoryId);
   const selectedGoals = goals.filter((goal) => selectedGoalIds.includes(goal.id));

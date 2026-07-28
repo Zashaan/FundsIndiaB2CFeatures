@@ -11,7 +11,7 @@ import { SidebarDrawer } from "./SidebarDrawer";
 const NAV_ITEMS = [
   { label: "Home", href: "/dashboard", icon: "⌂" },
   { label: "Funds", href: "/dashboard", icon: "₹" },
-  { label: "Goals", href: "/dashboard", icon: "◎" },
+  { label: "Goals", href: "/goals", icon: "◎" },
   { label: "Advisor", href: "/advisor-calls", icon: "☎" },
 ];
 
@@ -58,7 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <nav className="fixed inset-x-0 bottom-0 z-20 mx-auto grid max-w-md grid-cols-4 border-t border-slate-200 bg-white/95 px-2 py-2 backdrop-blur">
           {NAV_ITEMS.map((item) => {
-            const active = item.href === "/advisor-calls" ? pathname.startsWith(item.href) : pathname === item.href;
+            const active = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.label}

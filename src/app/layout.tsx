@@ -8,7 +8,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "FundsIndia B2C Features",
-  description: "Advisor call scheduling for guided mutual fund investors.",
+  description: "Goal planning and advisor call prototypes for guided mutual fund investors.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

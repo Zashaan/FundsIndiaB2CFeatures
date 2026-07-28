@@ -6,6 +6,7 @@ import { getUser } from "@/lib/data/repository";
 
 const WIRED = [
   { label: "Dashboard", href: "/dashboard", icon: "▦" },
+  { label: "Goals", href: "/goals", icon: "◎" },
   { label: "Advisor Calls", href: "/advisor-calls", icon: "A" },
   { label: "Summary", href: "/summary", icon: "S" },
   { label: "Settings", href: "/settings", icon: "⚙" },
