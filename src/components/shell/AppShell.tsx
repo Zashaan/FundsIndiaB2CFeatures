@@ -28,7 +28,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             type="button"
             onClick={() => setDrawerOpen(true)}
             aria-label="Open menu"
-            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-emerald-100 bg-[#ecfbf4] text-sm font-bold text-[#00a76f]"
+            className="fi-pressable relative flex h-11 w-11 items-center justify-center rounded-full border border-emerald-100 bg-[#ecfbf4] text-sm font-bold text-[#00a76f]"
           >
             RB
             <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-white bg-[#006bff]" />
@@ -47,14 +47,16 @@ export function AppShell({ children }: { children: ReactNode }) {
           <button
             type="button"
             aria-label="Notifications"
-            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-600 shadow-sm"
+            className="fi-pressable relative flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-600 shadow-sm"
           >
             N
             <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-[#00c781]" />
           </button>
         </header>
 
-        <main className="flex-1">{children}</main>
+        <main key={pathname} className="fi-route flex-1">
+          {children}
+        </main>
 
         <nav className="fixed inset-x-0 bottom-0 z-20 mx-auto grid max-w-md grid-cols-4 border-t border-slate-200 bg-white/95 px-2 py-2 backdrop-blur">
           {NAV_ITEMS.map((item) => {
@@ -63,7 +65,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold ${
+                className={`fi-pressable flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold ${
                   active ? "bg-[#eaf8ff] text-[#006bff]" : "text-slate-500"
                 }`}
               >

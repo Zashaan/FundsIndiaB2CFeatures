@@ -17,3 +17,143 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+@keyframes fi-route-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fi-screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fi-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fi-sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fi-soft-pulse {
+  0%,
+  100% {
+    box-shadow: 0 12px 30px rgb(0 167 111 / 0.08);
+  }
+  50% {
+    box-shadow: 0 16px 36px rgb(0 107 255 / 0.13);
+  }
+}
+
+.fi-route {
+  animation: fi-route-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fi-screen {
+  animation: fi-screen-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fi-screen > * {
+  animation: fi-item-in 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fi-screen > :nth-child(1) {
+  animation-delay: 20ms;
+}
+
+.fi-screen > :nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.fi-screen > :nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.fi-screen > :nth-child(4) {
+  animation-delay: 170ms;
+}
+
+.fi-screen > :nth-child(5) {
+  animation-delay: 220ms;
+}
+
+.fi-pressable {
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease;
+}
+
+.fi-pressable:active {
+  transform: scale(0.975);
+}
+
+.fi-card {
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.fi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 38px rgb(15 23 42 / 0.08);
+}
+
+.fi-progress {
+  transition: width 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fi-bottom-sheet {
+  animation: fi-sheet-up 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fi-hero-glow {
+  animation: fi-soft-pulse 3.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fi-route,
+  .fi-screen,
+  .fi-screen > *,
+  .fi-bottom-sheet,
+  .fi-hero-glow {
+    animation: none;
+  }
+
+  .fi-card,
+  .fi-pressable,
+  .fi-progress {
+    transition: none;
+  }
+}

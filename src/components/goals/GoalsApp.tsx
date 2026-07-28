@@ -145,7 +145,7 @@ function StepHeader({
           type="button"
           onClick={onBack}
           aria-label="Go back"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-xl font-semibold text-slate-700 shadow-sm"
+          className="fi-pressable flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-xl font-semibold text-slate-700 shadow-sm"
         >
           ‹
         </button>
@@ -156,7 +156,7 @@ function StepHeader({
       </div>
       {progressValue ? (
         <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-200">
-          <div className="h-full rounded-full bg-[linear-gradient(90deg,#00c781,#006bff)]" style={{ width: `${progressValue}%` }} />
+          <div className="fi-progress h-full rounded-full bg-[linear-gradient(90deg,#00c781,#006bff)]" style={{ width: `${progressValue}%` }} />
         </div>
       ) : null}
     </>
@@ -165,11 +165,11 @@ function StepHeader({
 
 function BottomAction({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <div className="fixed inset-x-0 bottom-20 z-30 mx-auto w-full max-w-md border-t border-slate-200 bg-white/95 p-4 backdrop-blur">
+    <div className="fi-bottom-sheet fixed inset-x-0 bottom-20 z-30 mx-auto w-full max-w-md border-t border-slate-200 bg-white/95 p-4 backdrop-blur">
       <button
         type="button"
         onClick={onClick}
-        className="h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white shadow-lg shadow-emerald-900/10"
+        className="fi-pressable h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white shadow-lg shadow-emerald-900/10"
       >
         {label}
       </button>
@@ -195,7 +195,7 @@ function GoalCard({ goal, onOpen }: { goal: Goal; onOpen: () => void }) {
         : "bg-[#ecfff7] text-[#00a76f]";
 
   return (
-    <button type="button" onClick={onOpen} className="w-full rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm">
+    <button type="button" onClick={onOpen} className="fi-card fi-pressable w-full rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">{goal.category}</p>
@@ -207,7 +207,7 @@ function GoalCard({ goal, onOpen }: { goal: Goal; onOpen: () => void }) {
         <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${statusColor}`}>{goal.projectedStatus}</span>
       </div>
       <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
-        <div className="h-full rounded-full bg-[linear-gradient(90deg,#00c781,#006bff)]" style={{ width: `${pct}%` }} />
+        <div className="fi-progress h-full rounded-full bg-[linear-gradient(90deg,#00c781,#006bff)]" style={{ width: `${pct}%` }} />
       </div>
       <div className="mt-3 flex items-center justify-between">
         <span className="text-sm font-bold text-slate-800">{pct}% funded</span>
@@ -232,7 +232,7 @@ function MiniGraph({ goal }: { goal: Goal }) {
   const projected = goal.projectedStatus === "Behind" ? 70 : goal.projectedStatus === "Ahead" ? 100 : 88;
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="fi-card rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-bold text-slate-950">Progress trajectory</h2>
         <span className="text-xs font-bold text-slate-500">Projected vs target</span>
@@ -240,9 +240,9 @@ function MiniGraph({ goal }: { goal: Goal }) {
       <div className="relative h-36 rounded-3xl bg-[linear-gradient(180deg,#f8fbff,#f2fff8)] p-4">
         <div className="absolute left-5 right-5 top-7 border-t border-dashed border-[#006bff]/50" />
         <div className="absolute bottom-8 left-5 right-5 h-2 rounded-full bg-white shadow-inner" />
-        <div className="absolute bottom-8 left-5 h-2 rounded-full bg-[linear-gradient(90deg,#00c781,#006bff)]" style={{ width: `${pct * 0.78}%` }} />
-        <div className="absolute bottom-8 left-5 h-10 border-l-2 border-[#00a76f]" style={{ left: `${18 + pct * 0.62}%` }} />
-        <div className="absolute bottom-8 left-5 h-24 border-l-2 border-dashed border-[#006bff]" style={{ left: `${18 + projected * 0.62}%` }} />
+        <div className="fi-progress absolute bottom-8 left-5 h-2 rounded-full bg-[linear-gradient(90deg,#00c781,#006bff)]" style={{ width: `${pct * 0.78}%` }} />
+        <div className="absolute bottom-8 left-5 h-10 border-l-2 border-[#00a76f] transition-[left] duration-500 ease-out" style={{ left: `${18 + pct * 0.62}%` }} />
+        <div className="absolute bottom-8 left-5 h-24 border-l-2 border-dashed border-[#006bff] transition-[left] duration-500 ease-out" style={{ left: `${18 + projected * 0.62}%` }} />
         <div className="absolute bottom-2 left-5 text-[11px] font-semibold text-slate-500">Today</div>
         <div className="absolute bottom-2 right-5 text-[11px] font-semibold text-slate-500">Target</div>
       </div>
@@ -318,9 +318,9 @@ export function GoalsApp() {
 
   if (view === "detail") {
     return (
-      <div className="space-y-5 px-4 pb-28">
+      <div className="fi-screen space-y-5 px-4 pb-28">
         <StepHeader eyebrow={selectedGoal.category} title={selectedGoal.name} onBack={() => setView("dashboard")} />
-        <section className="rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
+        <section className="fi-card rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-500">Target amount</p>
@@ -348,7 +348,7 @@ export function GoalsApp() {
         <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-bold text-slate-950">Contributors</h2>
-            <button onClick={() => setView("contributors")} className="text-sm font-bold text-[#006bff]">
+          <button onClick={() => setView("contributors")} className="fi-pressable rounded-xl px-2 py-1 text-sm font-bold text-[#006bff]">
               Add
             </button>
           </div>
@@ -378,12 +378,12 @@ export function GoalsApp() {
           </div>
         </section>
         <div className="grid grid-cols-2 gap-3">
-          <button className="h-12 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm">
+        <button className="fi-pressable h-12 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm">
             Edit goal
           </button>
           <Link
             href={`/advisor-calls?goal=${selectedGoal.id}&goalName=${encodeURIComponent(selectedGoal.name)}&category=new_investment`}
-            className="flex h-12 items-center justify-center rounded-2xl bg-[#006bff] text-sm font-bold text-white shadow-sm"
+            className="fi-pressable flex h-12 items-center justify-center rounded-2xl bg-[#006bff] text-sm font-bold text-white shadow-sm"
           >
             Talk to advisor
           </Link>
@@ -394,9 +394,9 @@ export function GoalsApp() {
 
   if (view === "contributors") {
     return (
-      <div className="space-y-5 px-4 pb-28">
+      <div className="fi-screen space-y-5 px-4 pb-28">
         <StepHeader eyebrow="Shared goal" title="Add contributor" onBack={() => setView("detail")} />
-        <section className="rounded-3xl border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] p-4 shadow-sm">
+        <section className="fi-card rounded-3xl border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] p-4 shadow-sm">
           <h2 className="font-bold text-slate-950">Build this goal together</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             Invite a spouse, parent, or family member to contribute toward {selectedGoal.name}. Existing FundsIndia users
@@ -410,10 +410,10 @@ export function GoalsApp() {
           id="invite-search"
           value={inviteQuery}
           onChange={(event) => setInviteQuery(event.target.value)}
-          className="h-12 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm outline-none focus:border-[#00a76f]"
+          className="h-12 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm outline-none transition-colors duration-200 focus:border-[#00a76f]"
           placeholder="Search by name, email, or phone"
         />
-        <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="fi-card rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">
             {inviteResult.kind === "existing" ? "Existing FundsIndia user" : "External invite"}
           </p>
@@ -431,7 +431,7 @@ export function GoalsApp() {
           <button
             type="button"
             onClick={inviteContributor}
-            className="mt-4 h-11 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white"
+            className="fi-pressable mt-4 h-11 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white"
           >
             {inviteResult.kind === "existing" ? "Send in-app invite" : "Invite externally"}
           </button>
@@ -451,12 +451,12 @@ export function GoalsApp() {
                   </div>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
-                  <button className="h-9 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-600">
+                  <button className="fi-pressable h-9 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-600">
                     Resend
                   </button>
                   <button
                     onClick={() => setPendingInvites((current) => current.filter((item) => item.id !== invite.id))}
-                    className="h-9 rounded-xl border border-rose-100 bg-white text-xs font-bold text-rose-600"
+                    className="fi-pressable h-9 rounded-xl border border-rose-100 bg-white text-xs font-bold text-rose-600"
                   >
                     Cancel
                   </button>
@@ -465,7 +465,7 @@ export function GoalsApp() {
             ))}
           </div>
         </section>
-        <button onClick={() => setView("detail")} className="h-12 w-full rounded-2xl bg-[#006bff] text-sm font-bold text-white">
+        <button onClick={() => setView("detail")} className="fi-pressable h-12 w-full rounded-2xl bg-[#006bff] text-sm font-bold text-white">
           Done
         </button>
         <p className="text-xs leading-5 text-slate-500">
@@ -477,7 +477,7 @@ export function GoalsApp() {
 
   if (view === "category") {
     return (
-      <div className="space-y-5 px-4 pb-28">
+      <div className="fi-screen space-y-5 px-4 pb-28">
         <StepHeader eyebrow="Step 1 of 5" title="What are you planning for?" progressValue={20} onBack={() => setView("dashboard")} />
         <div className="grid grid-cols-2 gap-3">
           {categories.map((category) => (
@@ -489,7 +489,7 @@ export function GoalsApp() {
                 setInitialInvestment(Math.min(500000, Math.round(category.defaultTarget * 0.12)));
                 setView("initial");
               }}
-              className="min-h-32 rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm"
+              className="fi-card fi-pressable min-h-32 rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm"
             >
               <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-black text-[#006bff]">
                 {category.icon}
@@ -504,9 +504,9 @@ export function GoalsApp() {
 
   if (view === "initial") {
     return (
-      <div className="space-y-5 px-4 pb-36">
+      <div className="fi-screen space-y-5 px-4 pb-36">
         <StepHeader eyebrow="Step 2 of 5" title="How much are you starting with?" progressValue={40} onBack={() => setView("category")} />
-        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="fi-card rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <label className="text-sm font-bold text-slate-900" htmlFor="initial-investment">
             Initial investment
           </label>
@@ -515,9 +515,9 @@ export function GoalsApp() {
             type="number"
             value={initialInvestment}
             onChange={(event) => setInitialInvestment(Number(event.target.value))}
-            className="mt-3 h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-xl font-black text-slate-950 outline-none focus:border-[#00a76f]"
+            className="mt-3 h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-xl font-black text-slate-950 outline-none transition-colors duration-200 focus:border-[#00a76f]"
           />
-          <button type="button" onClick={() => setInitialInvestment(0)} className="mt-4 text-sm font-bold text-[#006bff]">
+          <button type="button" onClick={() => setInitialInvestment(0)} className="fi-pressable mt-4 rounded-xl px-2 py-1 text-sm font-bold text-[#006bff]">
             Starting from zero
           </button>
         </section>
@@ -530,9 +530,9 @@ export function GoalsApp() {
     const estimate = initialInvestment + sipAmount * 12 * horizonYears;
 
     return (
-      <div className="space-y-5 px-4 pb-36">
+      <div className="fi-screen space-y-5 px-4 pb-36">
         <StepHeader eyebrow="Step 3 of 5" title="What can you contribute regularly?" progressValue={60} onBack={() => setView("initial")} />
-        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="fi-card rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <label className="text-sm font-bold text-slate-900" htmlFor="sip-amount">
             SIP amount
           </label>
@@ -541,7 +541,7 @@ export function GoalsApp() {
             type="number"
             value={sipAmount}
             onChange={(event) => setSipAmount(Number(event.target.value))}
-            className="mt-3 h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-xl font-black text-slate-950 outline-none focus:border-[#00a76f]"
+            className="mt-3 h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-xl font-black text-slate-950 outline-none transition-colors duration-200 focus:border-[#00a76f]"
           />
           <div className="mt-4 grid grid-cols-2 gap-2">
             {(["Monthly", "Quarterly"] as Frequency[]).map((option) => (
@@ -549,7 +549,7 @@ export function GoalsApp() {
                 key={option}
                 type="button"
                 onClick={() => setFrequency(option)}
-                className={`h-11 rounded-2xl border text-sm font-bold ${
+                className={`fi-pressable h-11 rounded-2xl border text-sm font-bold ${
                   frequency === option ? "border-[#006bff] bg-[#eef7ff] text-[#006bff]" : "border-slate-200 bg-white text-slate-600"
                 }`}
               >
@@ -568,9 +568,9 @@ export function GoalsApp() {
 
   if (view === "horizon") {
     return (
-      <div className="space-y-5 px-4 pb-36">
+      <div className="fi-screen space-y-5 px-4 pb-36">
         <StepHeader eyebrow="Step 4 of 5" title="When do you need this money?" progressValue={80} onBack={() => setView("sip")} />
-        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="fi-card rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <span className="text-sm font-bold text-slate-900">Time horizon</span>
             <strong className="text-2xl font-black text-slate-950">{horizonYears} years</strong>
@@ -595,7 +595,7 @@ export function GoalsApp() {
 
   if (view === "risk") {
     return (
-      <div className="space-y-5 px-4 pb-36">
+      <div className="fi-screen space-y-5 px-4 pb-36">
         <StepHeader eyebrow="Step 5 of 5" title="How much risk feels comfortable?" progressValue={100} onBack={() => setView("horizon")} />
         <div className="space-y-3">
           {(["Conservative", "Moderate", "Aggressive"] as Risk[]).map((option) => (
@@ -605,7 +605,7 @@ export function GoalsApp() {
                 setRisk(option);
                 setComparisonRisk(option);
               }}
-              className={`w-full rounded-3xl border p-4 text-left shadow-sm ${
+              className={`fi-card fi-pressable w-full rounded-3xl border p-4 text-left shadow-sm ${
                 risk === option ? "border-[#00a76f] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)]" : "border-slate-200 bg-white"
               }`}
             >
@@ -634,9 +634,9 @@ export function GoalsApp() {
           : "30% equity funds · 20% hybrid · 50% debt";
 
     return (
-      <div className="space-y-5 px-4 pb-28">
+      <div className="fi-screen space-y-5 px-4 pb-28">
         <StepHeader eyebrow="Confirmation" title="Your goal plan" onBack={() => setView("risk")} />
-        <section className="rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
+        <section className="fi-card rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
           <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">{goalCategory.label}</p>
           <h1 className="mt-1 text-2xl font-black text-slate-950">{rupee(goalCategory.defaultTarget)} target</h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -651,7 +651,7 @@ export function GoalsApp() {
               <button
                 key={option}
                 onClick={() => setComparisonRisk(option)}
-                className={`rounded-2xl border px-2 py-3 text-xs font-bold ${
+                className={`fi-pressable rounded-2xl border px-2 py-3 text-xs font-bold ${
                   comparisonRisk === option ? "border-[#006bff] bg-[#eef7ff] text-[#006bff]" : "border-slate-200 bg-white text-slate-600"
                 }`}
               >
@@ -678,13 +678,13 @@ export function GoalsApp() {
             </div>
           ))}
         </section>
-        <button onClick={createGoal} className="h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white">
+        <button onClick={createGoal} className="fi-pressable h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white">
           Confirm goal
         </button>
         <Link
           href={`/advisor-calls?goal=new-${goalCategory.id}&goalName=${encodeURIComponent(goalCategory.label)}&category=new_investment`}
           onClick={createGoal}
-          className="flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff] shadow-sm"
+          className="fi-pressable flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff] shadow-sm"
         >
           Talk to advisor
         </Link>
@@ -693,8 +693,8 @@ export function GoalsApp() {
   }
 
   return (
-    <div className="space-y-6 px-4 pb-28">
-      <section className="overflow-hidden rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
+    <div className="fi-screen space-y-6 px-4 pb-28">
+      <section className="fi-card fi-hero-glow overflow-hidden rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
         <div className="flex items-center justify-between gap-3">
           <Image
             src="/fundsindia-logo.png"
@@ -711,7 +711,7 @@ export function GoalsApp() {
         </p>
         <button
           onClick={() => setView("category")}
-          className="mt-5 h-12 rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] px-5 text-sm font-bold text-white shadow-lg shadow-emerald-900/10"
+          className="fi-pressable mt-5 h-12 rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] px-5 text-sm font-bold text-white shadow-lg shadow-emerald-900/10"
         >
           Create new goal
         </button>
@@ -723,7 +723,7 @@ export function GoalsApp() {
             <button
               key={nextTab}
               onClick={() => setTab(nextTab)}
-              className={`h-11 rounded-2xl text-sm font-bold capitalize ${
+              className={`fi-pressable h-11 rounded-2xl text-sm font-bold capitalize ${
                 tab === nextTab ? "bg-[#006bff] text-white" : "text-slate-500"
               }`}
             >
@@ -747,19 +747,19 @@ export function GoalsApp() {
           ))}
         </section>
       ) : (
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+        <section className="fi-card rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-[#eef7ff] text-xl font-black text-[#006bff]">
             ◎
           </div>
           <h2 className="mt-4 text-xl font-bold text-slate-950">No goals here yet</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">Create a goal to see progress, projections, and contributors.</p>
-          <button onClick={() => setView("category")} className="mt-5 h-11 rounded-2xl bg-[#006bff] px-5 text-sm font-bold text-white">
+          <button onClick={() => setView("category")} className="fi-pressable mt-5 h-11 rounded-2xl bg-[#006bff] px-5 text-sm font-bold text-white">
             Create first goal
           </button>
         </section>
       )}
 
-      <section className="rounded-3xl border border-[#d7edf8] bg-white p-4 shadow-sm">
+      <section className="fi-card rounded-3xl border border-[#d7edf8] bg-white p-4 shadow-sm">
         <div className="flex gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-black text-[#006bff]">
             CG
