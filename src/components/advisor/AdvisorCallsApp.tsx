@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
 type Step = "home" | "category" | "context" | "time" | "confirm" | "history" | "detail" | "briefing";
@@ -145,10 +144,10 @@ function AdvisorAvatar({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 
   return (
     <div
-      className={`${sizeClass} shrink-0 overflow-hidden rounded-full border-2 border-white bg-[linear-gradient(135deg,#00c781,#006bff)] shadow-sm`}
+      className={`${sizeClass} shrink-0 overflow-hidden rounded-full border-2 border-white bg-[linear-gradient(135deg,#73b7ff,#173f6f)] shadow-sm shadow-blue-950/10`}
       aria-label={`${assignedAdvisor.name} photo`}
     >
-      <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_24%,#e8fff6_0_18%,transparent_19%),linear-gradient(180deg,#dff7ff_0_44%,#12335f_45%)] text-xs font-black text-white">
+      <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_50%_24%,#edf7ff_0_18%,transparent_19%),linear-gradient(180deg,#d9ecff_0_44%,#173f6f_45%)] text-xs font-black text-white">
         {assignedAdvisor.initials}
       </div>
     </div>
@@ -158,16 +157,16 @@ function AdvisorAvatar({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 function AdvisorIdentityBlock({ compact = false }: { compact?: boolean }) {
   return (
     <section
-      className={`fi-card flex gap-3 rounded-3xl border border-[#c8eee1] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] shadow-sm ${
+      className={`fi-card flex gap-3 rounded-3xl border border-[#d8e7f5] bg-[linear-gradient(135deg,#ffffff_0%,#f4f8ff_62%,#eef5ff_100%)] shadow-sm ${
         compact ? "p-3" : "p-4"
       }`}
     >
       <AdvisorAvatar size={compact ? "sm" : "md"} />
       <div className="min-w-0">
-        <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Assigned advisor</p>
+        <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Assigned advisor</p>
         <h2 className="font-bold text-slate-950">{assignedAdvisor.name}</h2>
         <p className="mt-1 text-sm leading-5 text-slate-600">
-          Rekha already has your full history — just tell her what&apos;s on your mind.
+          Rekha keeps your portfolio context, recent notes, and goals ready before you speak.
         </p>
       </div>
     </section>
@@ -197,13 +196,13 @@ function StepHeader({
           ‹
         </button>
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">{eyebrow}</p>
+          <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">{eyebrow}</p>
           <h1 className="text-2xl font-bold leading-tight text-slate-950">{title}</h1>
         </div>
       </div>
       {progress ? (
-        <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-200">
-          <div className="fi-progress h-full rounded-full bg-[linear-gradient(90deg,#00c781,#006bff)]" style={{ width: `${progress}%` }} />
+        <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[#dce8f6]">
+          <div className="fi-progress h-full rounded-full bg-[linear-gradient(90deg,#7ab7ff,#0f4c81)]" style={{ width: `${progress}%` }} />
         </div>
       ) : null}
     </>
@@ -212,15 +211,15 @@ function StepHeader({
 
 function BottomAction({ label, onClick, disabled = false }: { label: string; onClick: () => void; disabled?: boolean }) {
   return (
-    <div className="fi-bottom-sheet fixed inset-x-0 bottom-20 z-30 mx-auto w-full max-w-md border-t border-slate-200 bg-white/95 p-4 backdrop-blur">
+    <div className="fi-bottom-sheet fixed inset-x-0 bottom-20 z-30 mx-auto w-full max-w-md border-t border-[#d8e7f5] bg-white/95 p-4 backdrop-blur">
       <button
         type="button"
         onClick={onClick}
         disabled={disabled}
-        className={`fi-pressable h-12 w-full rounded-2xl text-sm font-bold shadow-lg shadow-emerald-900/10 ${
+        className={`fi-pressable h-12 w-full rounded-2xl text-sm font-bold shadow-lg shadow-blue-950/10 ${
           disabled
             ? "bg-slate-200 text-slate-400"
-            : "bg-[linear-gradient(90deg,#00a76f,#006bff)] text-white"
+            : "bg-[linear-gradient(90deg,#006bff,#173f6f)] text-white"
         }`}
       >
         {label}
@@ -332,7 +331,7 @@ export function AdvisorCallsApp() {
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-bold text-[#006bff]">{call.date}</p>
-                <span className="rounded-full bg-[#ecfff7] px-3 py-1 text-xs font-bold text-[#00a76f]">
+                <span className="rounded-full bg-[#eef5ff] px-3 py-1 text-xs font-bold text-[#0f4c81]">
                   {call.category}
                 </span>
               </div>
@@ -350,11 +349,11 @@ export function AdvisorCallsApp() {
     return (
       <div className="fi-screen space-y-5 px-4 pb-28">
         <StepHeader eyebrow={`${selectedPastCall.date} · ${selectedPastCall.advisor}`} title={selectedPastCall.title} onBack={() => setStep("history")} />
-        <section className="fi-card rounded-3xl border border-[#bcebdc] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] p-4 shadow-sm">
+        <section className="fi-card rounded-3xl border border-[#d8e7f5] bg-[linear-gradient(135deg,#ffffff,#f3f8ff)] p-4 shadow-sm">
           <div className="flex items-center gap-3">
             <AdvisorAvatar size="sm" />
             <div>
-              <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">AI summary</p>
+              <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">AI summary</p>
               <h2 className="font-bold text-slate-950">{selectedPastCall.category}</h2>
             </div>
           </div>
@@ -370,7 +369,7 @@ export function AdvisorCallsApp() {
             <strong className="text-right text-sm text-slate-900">{selectedPastCall.action}</strong>
           </div>
         </section>
-        <button onClick={scheduleFollowUp} className="fi-pressable h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white">
+        <button onClick={scheduleFollowUp} className="fi-pressable h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#006bff,#173f6f)] text-sm font-bold text-white">
           Schedule follow-up
         </button>
       </div>
@@ -397,8 +396,8 @@ export function AdvisorCallsApp() {
             ))}
           </div>
         </section>
-        <section className="fi-card rounded-3xl border border-[#bcebdc] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] p-4 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">This booking</p>
+        <section className="fi-card rounded-3xl border border-[#d8e7f5] bg-[linear-gradient(135deg,#ffffff,#f3f8ff)] p-4 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">This booking</p>
           <h2 className="mt-1 font-bold text-slate-950">{advisorBrief.headline}</h2>
           <p className="mt-3 text-sm leading-6 text-slate-700">{advisorBrief.summary}</p>
           <p className="mt-3 text-sm leading-6 text-slate-600">{advisorBrief.context}</p>
@@ -458,7 +457,7 @@ export function AdvisorCallsApp() {
 
         <section className="fi-card rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-[#ecfff7] px-3 py-2 text-xs font-bold text-[#00a76f]">
+            <span className="rounded-full bg-[#eef5ff] px-3 py-2 text-xs font-bold text-[#0f4c81]">
               {category.title}
             </span>
             <button
@@ -485,7 +484,7 @@ export function AdvisorCallsApp() {
                   type="button"
                   onClick={() => chooseCategory(item.id)}
                   className={`fi-pressable rounded-2xl border px-3 py-3 text-left text-sm font-bold ${
-                    item.id === categoryId ? "border-[#00a76f] bg-[#ecfff7] text-[#00a76f]" : "border-slate-200 bg-slate-50 text-slate-700"
+                    item.id === categoryId ? "border-[#006bff] bg-[#eef5ff] text-[#0f4c81]" : "border-slate-200 bg-slate-50 text-slate-700"
                   }`}
                 >
                   {item.title}
@@ -505,7 +504,7 @@ export function AdvisorCallsApp() {
           value={topicText}
           onChange={(event) => setTopicText(event.target.value)}
           placeholder={category.placeholder}
-          className="min-h-44 w-full resize-none rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-800 shadow-sm outline-none transition-colors duration-200 focus:border-[#00a76f]"
+          className="min-h-44 w-full resize-none rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-800 shadow-sm outline-none transition-colors duration-200 focus:border-[#006bff]"
         />
         {!topicIsValid ? <p className="text-sm font-semibold text-rose-600">Add a short note before continuing.</p> : null}
 
@@ -572,10 +571,10 @@ export function AdvisorCallsApp() {
             <section className="fi-card rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">AI suggested</p>
+                  <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Calendar suggested</p>
                   <h2 className="font-bold text-slate-950">Recommended slots</h2>
                 </div>
-                <span className="rounded-full bg-[#ecfff7] px-3 py-1 text-xs font-bold text-[#00a76f]">
+                <span className="rounded-full bg-[#eef5ff] px-3 py-1 text-xs font-bold text-[#0f4c81]">
                   Synced
                 </span>
               </div>
@@ -630,7 +629,7 @@ export function AdvisorCallsApp() {
                     type="button"
                     onClick={() => setManualDay(day)}
                     className={`fi-pressable min-h-16 min-w-20 rounded-2xl border px-3 text-sm font-bold ${
-                      manualDay === day ? "border-[#00a76f] bg-[#ecfff7] text-[#00a76f]" : "border-slate-200 bg-white text-slate-700"
+                      manualDay === day ? "border-[#006bff] bg-[#eef5ff] text-[#0f4c81]" : "border-slate-200 bg-white text-slate-700"
                     }`}
                   >
                     {day}
@@ -694,7 +693,7 @@ export function AdvisorCallsApp() {
           <div className="flex gap-3">
             <AdvisorAvatar size="md" />
             <div className="min-w-0">
-              <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Call with</p>
+              <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Call with</p>
               <h2 className="font-bold text-slate-950">{assignedAdvisor.name}</h2>
               <p className="text-sm text-slate-500">{selectedSlot.day}, {selectedSlot.date} · {selectedSlot.time}</p>
             </div>
@@ -727,11 +726,11 @@ export function AdvisorCallsApp() {
             </div>
           </div>
         </section>
-        <section className="fi-card rounded-3xl border border-[#bcebdc] bg-[linear-gradient(135deg,#f0fff8,#eef7ff)] p-4 shadow-sm">
+        <section className="fi-card rounded-3xl border border-[#d8e7f5] bg-[linear-gradient(135deg,#ffffff,#f3f8ff)] p-4 shadow-sm">
           <p className="text-sm leading-6 text-slate-700">
             {assignedAdvisor.name} will review your notes and recent call history before the call.
           </p>
-          <p className="mt-2 text-sm font-semibold text-[#00a76f]">Calendar event added to your synced calendar.</p>
+          <p className="mt-2 text-sm font-semibold text-[#0f4c81]">Calendar event added to your synced calendar.</p>
         </section>
         <div className="grid grid-cols-2 gap-3">
           <button
@@ -755,7 +754,7 @@ export function AdvisorCallsApp() {
             setBookingCommitted(true);
             setStep("home");
           }}
-          className="fi-pressable h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white shadow-lg shadow-emerald-900/10"
+          className="fi-pressable h-12 w-full rounded-2xl bg-[linear-gradient(90deg,#006bff,#173f6f)] text-sm font-bold text-white shadow-lg shadow-blue-950/10"
         >
           Done
         </button>
@@ -765,24 +764,29 @@ export function AdvisorCallsApp() {
 
   return (
     <div className="fi-screen space-y-6 px-4 pb-28">
-      <section className="fi-card fi-hero-glow overflow-hidden rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
-        <div className="flex items-center justify-between gap-3">
-          <Image
-            src="/fundsindia-logo.png"
-            alt="FundsIndia"
-            width={132}
-            height={69}
-            className="h-10 w-auto object-contain mix-blend-multiply"
-          />
-          <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#006bff] shadow-sm">Advisor ready</span>
+      <section className="fi-card overflow-hidden rounded-[28px] border border-[#d8e7f5] bg-[linear-gradient(135deg,#ffffff_0%,#f4f8ff_58%,#eaf3ff_100%)] p-5 shadow-sm shadow-blue-950/5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Private advisory desk</p>
+            <h1 className="mt-2 text-3xl font-black leading-tight text-slate-950">Guidance with Rekha</h1>
+          </div>
+          <AdvisorAvatar size="lg" />
         </div>
-        <p className="mt-5 text-xs font-bold uppercase tracking-normal text-[#00a76f]">Advisor calls</p>
-        <h1 className="mt-1 text-3xl font-black leading-tight text-slate-950">Talk to your advisor</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
           Rekha already knows your portfolio, goals, and past conversations. Tell her what feels unclear and pick a time.
         </p>
-        <button onClick={() => setStep("category")} className="fi-pressable mt-5 h-12 rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] px-5 text-sm font-bold text-white shadow-lg shadow-emerald-900/10">
-          Talk to your advisor
+        <div className="mt-5 grid grid-cols-[auto_1fr] gap-3 rounded-3xl border border-[#d8e7f5] bg-white/80 p-3">
+          <div className="flex h-12 w-12 flex-col items-center justify-center rounded-2xl bg-[#0f4c81] text-white">
+            <strong className="text-sm leading-none">28</strong>
+            <span className="text-[10px] font-bold">Jul</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-slate-950">Next advisory window</p>
+            <p className="text-xs leading-5 text-slate-500">4:30 PM · calendar-aware suggestions</p>
+          </div>
+        </div>
+        <button onClick={() => setStep("category")} className="fi-pressable mt-5 h-12 rounded-2xl bg-[linear-gradient(90deg,#006bff,#173f6f)] px-5 text-sm font-bold text-white shadow-lg shadow-blue-950/10">
+          Schedule a call
         </button>
       </section>
 
@@ -860,7 +864,7 @@ export function AdvisorCallsApp() {
             >
               <div className="flex items-center justify-between gap-3">
                 <strong className="block text-slate-950">{call.title}</strong>
-                <span className="shrink-0 rounded-full bg-[#ecfff7] px-2 py-1 text-[11px] font-bold text-[#00a76f]">
+                <span className="shrink-0 rounded-full bg-[#eef5ff] px-2 py-1 text-[11px] font-bold text-[#0f4c81]">
                   {call.category}
                 </span>
               </div>
