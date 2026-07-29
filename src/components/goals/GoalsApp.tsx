@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { FundsIndiaLogo } from "@/components/brand/FundsIndiaLogo";
 
 type View =
   | "dashboard"
@@ -1071,13 +1071,7 @@ export function GoalsApp() {
     <div className="fi-screen space-y-6 px-4 pb-28">
       <section className="fi-card fi-hero-glow overflow-hidden rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
         <div className="flex items-center justify-between gap-3">
-          <Image
-            src="/fundsindia-logo.png"
-            alt="FundsIndia"
-            width={132}
-            height={69}
-            className="h-10 w-auto object-contain mix-blend-multiply"
-          />
+          <FundsIndiaLogo width={132} height={69} className="h-10" variant="hero" />
           <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#006bff] shadow-sm">Goals</span>
         </div>
         <h1 className="mt-5 text-3xl font-black leading-tight text-slate-950">Invest toward the life you&apos;re building</h1>
@@ -1166,9 +1160,16 @@ export function GoalsApp() {
           <div>
             <h2 className="font-bold text-slate-950">Collaborative goals</h2>
             <p className="mt-1 text-sm leading-5 text-slate-600">
-              Share a goal with your spouse or family member so both of you can contribute toward the same target.
+              Invite a spouse or family member to Daughter&apos;s education so both of you can contribute toward the same target.
             </p>
           </div>
+        </div>
+        <div className="mt-4 rounded-2xl bg-[#ecfff7] p-3">
+          <p className="text-[11px] font-bold uppercase tracking-normal text-[#00a76f]">Invite destination</p>
+          <p className="mt-1 text-sm font-bold text-slate-950">Daughter&apos;s education</p>
+          <p className="mt-1 text-xs leading-5 text-slate-600">
+            This dashboard shortcut adds the collaborator to the active shared education goal.
+          </p>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <button
@@ -1179,7 +1180,7 @@ export function GoalsApp() {
             }}
             className="fi-pressable h-11 rounded-2xl bg-[#00a76f] text-sm font-bold text-white"
           >
-            Invite contributor
+            Invite to education
           </button>
           <Link href="/advisor-calls?category=portfolio_review" className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]">
             Ask Rekha

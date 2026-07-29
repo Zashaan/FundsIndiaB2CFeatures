@@ -55,7 +55,7 @@ const categories: Category[] = [
   },
   {
     id: "miscellaneous",
-    title: "Not sure — just let me explain",
+    title: "Just let me explain",
     description: "Start with your question. Rekha will help classify it.",
     placeholder: "Tell us what's on your mind",
     icon: "NS",
@@ -791,7 +791,7 @@ export function AdvisorCallsApp() {
           <AdvisorAvatar size="lg" />
         </div>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Rekha already knows your portfolio, goals, and past conversations. Tell her what feels unclear and pick a time.
+          Rekha already knows your portfolio, goals, and past conversations. Tell her what you want to talk about and pick a time.
         </p>
         <div className="mt-5 grid grid-cols-[auto_1fr] gap-3 rounded-3xl border border-[#d8e7f5] bg-white/80 p-3">
           <div className="flex h-12 w-12 flex-col items-center justify-center rounded-2xl bg-[#0f4c81] text-white">

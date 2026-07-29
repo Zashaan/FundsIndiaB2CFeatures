@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FundsIndiaLogo } from "@/components/brand/FundsIndiaLogo";
 import { SummaryContext } from "@/lib/summary/summaryContext";
 import { useWeeklySummary } from "@/lib/summary/useWeeklySummary";
 import { ThemeProvider } from "@/lib/theme/themeContext";
@@ -36,14 +36,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-white bg-[#006bff]" />
             </button>
             <div className="flex flex-col items-center">
-              <Image
-                src="/fundsindia-logo.png"
-                alt="FundsIndia"
-                width={146}
-                height={76}
-                priority
-                className="h-9 w-auto object-contain mix-blend-multiply"
-              />
+              <FundsIndiaLogo width={146} height={76} className="h-9" variant="header" />
               <p className="-mt-1 text-[10px] font-semibold text-slate-500">Guided mutual fund investing</p>
             </div>
             <button

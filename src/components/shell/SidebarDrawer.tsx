@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { FundsIndiaLogo } from "@/components/brand/FundsIndiaLogo";
 import { getUser } from "@/lib/data/repository";
 import { useTheme } from "@/lib/theme/themeContext";
 
@@ -35,14 +35,8 @@ export function SidebarDrawer({ open, onClose }: { open: boolean; onClose: () =>
       <aside
         className={`absolute left-0 top-0 h-full w-4/5 max-w-xs overflow-y-auto bg-white p-5 shadow-xl transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="mb-6 rounded-3xl bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_58%,#ffffff_100%)] p-4">
-          <Image
-            src="/fundsindia-logo.png"
-            alt="FundsIndia"
-            width={160}
-            height={84}
-            className="h-10 w-auto object-contain mix-blend-multiply"
-          />
+        <div className="fi-profile-card mb-6 rounded-3xl bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_58%,#ffffff_100%)] p-4">
+          <FundsIndiaLogo width={160} height={84} className="h-10" variant="drawer" />
           <h2 className="mt-4 text-2xl font-bold text-slate-900">{user.name}</h2>
           {/* Demo stub: the seed User type has no email field, so this is a fixed display value, not a data-layer gap. */}
           <p className="text-sm text-slate-500">ritikbansal27.rb@gmail.com</p>
