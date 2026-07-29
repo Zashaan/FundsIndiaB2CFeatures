@@ -142,46 +142,6 @@ body {
   animation: fi-soft-pulse 3.6s ease-in-out infinite;
 }
 
-.fi-logo-mark {
-  position: relative;
-  display: inline-flex;
-  flex-shrink: 0;
-  overflow: hidden;
-  transform: rotate(45deg);
-  border-radius: 8px;
-  background: linear-gradient(135deg, #00c781 0 47%, #006bff 48% 100%);
-}
-
-.fi-logo-mark::before {
-  position: absolute;
-  inset: 18% 18% 18% 18%;
-  border-radius: 5px;
-  border-bottom: 3px solid rgb(255 255 255 / 0.86);
-  border-right: 3px solid rgb(255 255 255 / 0.86);
-  content: "";
-}
-
-.fi-logo-mark span {
-  position: absolute;
-  left: 18%;
-  right: 18%;
-  height: 3px;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.82);
-}
-
-.fi-logo-mark span:nth-child(1) {
-  top: 28%;
-}
-
-.fi-logo-mark span:nth-child(2) {
-  top: 46%;
-}
-
-.fi-logo-mark span:nth-child(3) {
-  top: 64%;
-}
-
 [data-theme="dark"] body {
   background: #050b16;
   color: #e5eefb;
