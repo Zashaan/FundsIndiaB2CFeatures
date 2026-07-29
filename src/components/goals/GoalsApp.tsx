@@ -167,6 +167,37 @@ function progress(goal: Goal) {
   return Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100));
 }
 
+function remainingAmount(goal: Goal) {
+  return Math.max(0, goal.targetAmount - goal.currentAmount);
+}
+
+function goalStory(goal: Goal) {
+  if (goal.id === "education") {
+    return "This is the college fund Ritik and Ananya are building together, one SIP at a time.";
+  }
+  if (goal.id === "home") {
+    return "This is the first home fund. It is close enough to feel real, but needs one planning decision.";
+  }
+  if (goal.id === "emergency") {
+    return "This reserve gives the family breathing room before taking bigger investment risk.";
+  }
+  return "This goal turns a future plan into a monthly investment habit.";
+}
+
+function milestoneCopy(goal: Goal) {
+  const pct = progress(goal);
+  if (pct >= 100) return "Goal completed. The next step is protecting access and withdrawal timing.";
+  if (pct >= 50) return "Halfway moment is close. A small SIP increase could protect the timeline.";
+  if (pct >= 35) return "The foundation is in place. The next milestone is crossing 50% funded.";
+  return "Early build phase. Consistency matters more than chasing returns right now.";
+}
+
+function contributionMoment(goal: Goal) {
+  const hasPartner = goal.contributors.length > 1;
+  if (hasPartner) return `${goal.contributors[1].name} is already contributing ${goal.contributors[1].amount}.`;
+  return "Invite a spouse or family member to turn this into a shared plan.";
+}
+
 function StepHeader({
   eyebrow,
   title,
@@ -253,6 +284,7 @@ function GoalCard({ goal, onOpen }: { goal: Goal; onOpen: () => void }) {
         <span className="text-sm font-bold text-slate-800">{pct}% funded</span>
         <span className="text-xs font-semibold text-slate-500">{goal.adherenceStatus}</span>
       </div>
+      <p className="mt-3 rounded-2xl bg-[#f8fafc] p-3 text-xs leading-5 text-slate-600">{milestoneCopy(goal)}</p>
       <div className="mt-4 flex items-center justify-between">
         <div className="-space-x-2 flex">
           {goal.contributors.map((contributor) => (
@@ -396,6 +428,9 @@ export function GoalsApp() {
 
   const selectedGoal = goals.find((goal) => goal.id === selectedGoalId) ?? goals[0];
   const visibleGoals = goals.filter((goal) => goal.status === tab);
+  const activeGoalRemaining = goals
+    .filter((goal) => goal.status === "active")
+    .reduce((total, goal) => total + remainingAmount(goal), 0);
   const inviteLooksExisting = inviteQuery.toLowerCase().includes("ananya") || inviteQuery.includes("@example.com");
   const inviteResult: InviteResult = inviteLooksExisting
     ? existingUserResult
@@ -543,6 +578,27 @@ export function GoalsApp() {
               {progress(selectedGoal)}%
             </span>
           </div>
+          <p className="mt-4 rounded-2xl bg-white/75 p-3 text-sm leading-6 text-slate-700">{goalStory(selectedGoal)}</p>
+        </section>
+        <section className="fi-card rounded-3xl border border-[#d7edf8] bg-white p-4 shadow-sm">
+          <div className="flex gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-black text-[#006bff]">
+              MS
+            </span>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Next milestone</p>
+              <h2 className="mt-1 font-bold text-slate-950">{milestoneCopy(selectedGoal)}</h2>
+              <p className="mt-1 text-sm leading-5 text-slate-600">
+                {rupee(remainingAmount(selectedGoal))} remains. Rekha can review whether the current SIP and fund mix are still enough.
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/advisor-calls?goal=${selectedGoal.id}&goalName=${encodeURIComponent(selectedGoal.name)}&category=portfolio_review&returnTo=${encodeURIComponent(`/goals?goal=${selectedGoal.id}&view=detail`)}`}
+            className="fi-pressable mt-4 flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]"
+          >
+            Ask Rekha about this goal
+          </Link>
         </section>
         <PortfolioValueChart goal={selectedGoal} />
         <section className="grid grid-cols-2 gap-3">
@@ -585,6 +641,9 @@ export function GoalsApp() {
               Add
             </button>
           </div>
+          <p className="mb-3 rounded-2xl bg-[#ecfff7] p-3 text-xs font-semibold leading-5 text-[#00a76f]">
+            {contributionMoment(selectedGoal)}
+          </p>
           <div className="space-y-3">
             {selectedGoal.contributors.map((contributor) => (
               <div key={contributor.id} className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-3">
@@ -1023,14 +1082,41 @@ export function GoalsApp() {
         </div>
         <h1 className="mt-5 text-3xl font-black leading-tight text-slate-950">Invest toward the life you&apos;re building</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Set a goal, track whether you&apos;re on pace, and invite someone you trust to contribute with you.
+          Each goal is a story, a timeline, and a shared contribution plan that Rekha can help you keep on track.
         </p>
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          {[
+            [rupee(activeGoalRemaining), "Still to fund"],
+            ["2", "Shared people"],
+            ["1", "Needs Rekha"],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-2xl bg-white/75 p-3">
+              <strong className="block text-sm font-black text-slate-950">{value}</strong>
+              <span className="text-[11px] font-semibold leading-4 text-slate-500">{label}</span>
+            </div>
+          ))}
+        </div>
         <button
           onClick={() => setView("category")}
           className="fi-pressable mt-5 h-12 rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] px-5 text-sm font-bold text-white shadow-lg shadow-emerald-900/10"
         >
           Create new goal
         </button>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-[#f7e3bf] bg-[linear-gradient(135deg,#fffdf7,#f8fbff)] p-4 shadow-sm">
+        <div className="flex gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-xs font-black text-amber-700">
+            ST
+          </span>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-normal text-amber-700">Progress story</p>
+            <h2 className="mt-1 font-bold text-slate-950">The education fund is now past its early build phase</h2>
+            <p className="mt-1 text-sm leading-5 text-slate-600">
+              Ritik and Ananya have crossed ₹18.3L together. The next emotional milestone is halfway funded.
+            </p>
+          </div>
+        </div>
       </section>
 
       <section className="rounded-3xl border border-slate-200 bg-white p-2 shadow-sm">
@@ -1083,6 +1169,21 @@ export function GoalsApp() {
               Share a goal with your spouse or family member so both of you can contribute toward the same target.
             </p>
           </div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedGoalId("education");
+              setView("contributors");
+            }}
+            className="fi-pressable h-11 rounded-2xl bg-[#00a76f] text-sm font-bold text-white"
+          >
+            Invite contributor
+          </button>
+          <Link href="/advisor-calls?category=portfolio_review" className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]">
+            Ask Rekha
+          </Link>
         </div>
       </section>
     </div>

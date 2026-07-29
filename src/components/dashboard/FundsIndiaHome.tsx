@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { AssetClass, Fund } from "@/lib/data/types";
-import { getNavRangeForFund, getSnapshots } from "@/lib/data/repository";
+import { getEventsInRange, getNavRangeForFund, getSnapshots } from "@/lib/data/repository";
 
 const ASSET_LABEL: Record<AssetClass, string> = {
   equity: "Equity",
@@ -68,6 +68,7 @@ export function FundsIndiaHome({ funds }: { funds: Fund[] }) {
   const previous = snapshots[Math.max(0, snapshots.length - 2)];
   const change = latest.totalValue - previous.totalValue;
   const changePct = previous.totalValue > 0 ? (change / previous.totalValue) * 100 : 0;
+  const recentEvents = getEventsInRange(previous.date, latest.date).slice(0, 2);
   const recommended = [...funds]
     .sort((a, b) => (demoReturnPct(b) ?? -Infinity) - (demoReturnPct(a) ?? -Infinity))
     .slice(0, 3);
@@ -76,9 +77,17 @@ export function FundsIndiaHome({ funds }: { funds: Fund[] }) {
   return (
     <div className="fi-screen space-y-6 px-4 pb-28">
       <section className="fi-card overflow-hidden rounded-[28px] bg-[#0b1220] p-5 text-white shadow-lg shadow-slate-950/10">
-        <p className="text-xs font-bold uppercase tracking-normal text-[#7dd3fc]">Home</p>
-        <h1 className="mt-2 text-3xl font-black leading-tight">Portfolio confidence</h1>
-        <div className="mt-3 flex items-end justify-between gap-4">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#7dd3fc]">Confidence dashboard</p>
+            <h1 className="mt-2 text-3xl font-black leading-tight">Your money is moving with a plan</h1>
+          </div>
+          <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-full border border-white/15 bg-white/10">
+            <strong className="text-xl leading-none">92</strong>
+            <span className="text-[10px] font-bold text-slate-300">Score</span>
+          </div>
+        </div>
+        <div className="mt-5 flex items-end justify-between gap-4">
           <div>
             <p className="text-2xl font-black leading-tight">{rupee(latest.totalValue)}</p>
             <p className="mt-1 text-sm text-slate-300">Total mutual fund portfolio value</p>
@@ -90,13 +99,41 @@ export function FundsIndiaHome({ funds }: { funds: Fund[] }) {
         </div>
         <div className="mt-5 grid grid-cols-3 gap-2">
           {[
-            ["92", "Confidence score"],
-            ["7", "Funds held"],
-            ["₹62K", "Monthly SIP"],
+            ["Healthy", "Allocation"],
+            ["1 goal", "Needs action"],
+            ["Rekha", "Advisor ready"],
           ].map(([value, label]) => (
             <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
-              <strong className="block text-lg font-black text-white">{value}</strong>
+              <strong className="block text-sm font-black text-white">{value}</strong>
               <span className="text-[11px] font-semibold leading-4 text-slate-300">{label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-[#caefe3] bg-white p-4 shadow-sm">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Portfolio health</p>
+            <h2 className="mt-1 font-bold text-slate-950">3 checks passed, 1 needs a decision</h2>
+          </div>
+          <span className="rounded-full bg-[#ecfff7] px-3 py-1 text-xs font-bold text-[#00a76f]">Low anxiety</span>
+        </div>
+        <div className="mt-4 space-y-3">
+          {[
+            ["SIPs are consistent", "₹62K scheduled this month", "Good"],
+            ["Risk matches profile", "Moderate with controlled satellite exposure", "Good"],
+            ["Goal funding", "Home down payment has a projected shortfall", "Review"],
+          ].map(([title, copy, state]) => (
+            <div key={title} className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3">
+              <span className={`h-2.5 w-2.5 rounded-full ${state === "Review" ? "bg-amber-500" : "bg-[#00a76f]"}`} />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-slate-950">{title}</p>
+                <p className="mt-0.5 text-xs leading-5 text-slate-500">{copy}</p>
+              </div>
+              <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${state === "Review" ? "bg-amber-50 text-amber-700" : "bg-white text-[#00a76f]"}`}>
+                {state}
+              </span>
             </div>
           ))}
         </div>
@@ -113,6 +150,28 @@ export function FundsIndiaHome({ funds }: { funds: Fund[] }) {
           <h2 className="mt-4 font-bold text-slate-950">Advisor ready</h2>
           <p className="mt-1 text-sm leading-5 text-slate-500">Rekha can review your next move.</p>
         </Link>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-[#d8e7f5] bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Since your last visit</p>
+            <h2 className="mt-1 font-bold text-slate-950">The important changes are summarized</h2>
+          </div>
+          <span className="rounded-full bg-[#eef7ff] px-3 py-1 text-xs font-bold text-[#006bff]">2 days</span>
+        </div>
+        <div className="space-y-3">
+          <div className="rounded-2xl bg-slate-50 p-3">
+            <p className="text-sm font-bold text-slate-950">Portfolio value moved {change >= 0 ? "up" : "down"} {rupee(Math.abs(change))}</p>
+            <p className="mt-1 text-xs leading-5 text-slate-500">Mainly from market movement, while SIP behavior stayed unchanged.</p>
+          </div>
+          {(recentEvents.length ? recentEvents : [{ id: "fallback", headline: "No major market event changed the plan", summary: "Your allocation and SIP posture remain consistent with the current risk profile." }]).map((event) => (
+            <div key={event.id} className="rounded-2xl bg-slate-50 p-3">
+              <p className="text-sm font-bold text-slate-950">{event.headline}</p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">{event.summary}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="fi-card rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -156,6 +215,27 @@ export function FundsIndiaHome({ funds }: { funds: Fund[] }) {
             </Link>
           ))}
         </div>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-[#d8e7f5] bg-[linear-gradient(135deg,#ffffff,#f3f8ff)] p-4 shadow-sm">
+        <div className="flex gap-3">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#eef7ff] text-xs font-black text-[#006bff]">
+            RN
+          </span>
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Rekha is already briefed</p>
+            <h2 className="mt-1 font-bold text-slate-950">Ask before changing SIPs or adding new funds</h2>
+            <p className="mt-1 text-sm leading-5 text-slate-600">
+              She can see your home goal shortfall, education progress, recent market context, and fund shortlist before the call.
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/advisor-calls?category=portfolio_review"
+          className="fi-pressable mt-4 flex h-11 items-center justify-center rounded-2xl bg-[#006bff] text-sm font-bold text-white"
+        >
+          Talk to Rekha
+        </Link>
       </section>
 
       <section className="fi-card rounded-3xl border border-[#d8e7f5] bg-[linear-gradient(135deg,#ffffff,#f3f8ff)] p-4 shadow-sm">

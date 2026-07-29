@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import type { AssetClass, Fund, RiskLevel } from "@/lib/data/types";
 import { getNavRangeForFund } from "@/lib/data/repository";
 
@@ -16,6 +19,9 @@ const RISK_STYLE: Record<RiskLevel, string> = {
   high: "bg-amber-50 text-amber-700",
   "very high": "bg-rose-50 text-rose-600",
 };
+
+type AssetFilter = "all" | AssetClass;
+type RiskFilter = "all" | RiskLevel;
 
 function rupee(value: number) {
   if (value >= 10000000) return `₹${(value / 10000000).toFixed(1)}Cr`;
@@ -45,10 +51,41 @@ function fitCopy(fund: Fund) {
   return "Core equity option for long-term growth-oriented goals.";
 }
 
+function goalFit(fund: Fund) {
+  if (fund.assetClass === "liquid") return "Emergency reserve";
+  if (fund.assetClass === "debt") return "Home down payment";
+  if (fund.assetClass === "gold") return "Portfolio hedge";
+  if (fund.assetClass === "international") return "Long-term wealth";
+  if (fund.riskLevel === "very high") return "Small satellite";
+  return "Education goal";
+}
+
+function whyThisFund(fund: Fund) {
+  const returnPct = demoReturnPct(fund);
+  const returnText = returnPct === undefined ? "has limited demo history" : `is ${returnPct >= 0 ? "up" : "down"} ${Math.abs(returnPct).toFixed(1)}% in the demo window`;
+  return `${fund.name} ${returnText}, carries ${riskLabel(fund.riskLevel).toLowerCase()} risk, and costs ${fund.expenseRatio}% annually.`;
+}
+
 export function FundsExplorer({ funds }: { funds: Fund[] }) {
   const sortedFunds = [...funds].sort((a, b) => (demoReturnPct(b) ?? -Infinity) - (demoReturnPct(a) ?? -Infinity));
+  const [assetFilter, setAssetFilter] = useState<AssetFilter>("all");
+  const [riskFilter, setRiskFilter] = useState<RiskFilter>("all");
+  const [compareIds, setCompareIds] = useState<string[]>(sortedFunds.slice(0, 2).map((fund) => fund.id));
   const coreFunds = sortedFunds.filter((fund) => fund.riskLevel === "low" || fund.riskLevel === "moderate").slice(0, 3);
+  const filteredFunds = sortedFunds.filter((fund) => {
+    const assetMatches = assetFilter === "all" || fund.assetClass === assetFilter;
+    const riskMatches = riskFilter === "all" || fund.riskLevel === riskFilter;
+    return assetMatches && riskMatches;
+  });
+  const compareFunds = compareIds.map((id) => funds.find((fund) => fund.id === id)).filter((fund): fund is Fund => Boolean(fund));
   const totalSip = 62000;
+
+  const toggleCompare = (fundId: string) => {
+    setCompareIds((current) => {
+      if (current.includes(fundId)) return current.filter((id) => id !== fundId);
+      return [fundId, ...current].slice(0, 3);
+    });
+  };
 
   return (
     <div className="fi-screen space-y-6 px-4 pb-28">
@@ -78,17 +115,93 @@ export function FundsExplorer({ funds }: { funds: Fund[] }) {
       </section>
 
       <section className="fi-card rounded-3xl border border-slate-200 bg-white p-2 shadow-sm">
+        <p className="px-2 pb-2 pt-1 text-xs font-bold uppercase tracking-normal text-[#7c3aed]">Filter by role</p>
         <div className="grid grid-cols-4 gap-1">
-          {["All", "Equity", "Debt", "Liquid"].map((label, index) => (
+          {[
+            ["all", "All"],
+            ["equity", "Equity"],
+            ["debt", "Debt"],
+            ["liquid", "Liquid"],
+          ].map(([value, label]) => (
             <button
               key={label}
               type="button"
-              className={`fi-pressable h-10 rounded-2xl text-xs font-bold ${index === 0 ? "bg-[#006bff] text-white" : "text-slate-500"}`}
+              onClick={() => setAssetFilter(value as AssetFilter)}
+              className={`fi-pressable h-10 rounded-2xl text-xs font-bold ${assetFilter === value ? "bg-[#006bff] text-white" : "text-slate-500"}`}
             >
               {label}
             </button>
           ))}
         </div>
+        <div className="mt-2 grid grid-cols-4 gap-1">
+          {[
+            ["all", "Any risk"],
+            ["low", "Low"],
+            ["moderate", "Moderate"],
+            ["high", "High"],
+          ].map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setRiskFilter(value as RiskFilter)}
+              className={`fi-pressable min-h-10 rounded-2xl px-1 text-[11px] font-bold ${riskFilter === value ? "bg-[#7c3aed] text-white" : "text-slate-500"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-[#d8e7f5] bg-[linear-gradient(135deg,#ffffff,#f3f8ff)] p-4 shadow-sm">
+        <div className="flex gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#eef7ff] text-xs font-black text-[#006bff]">
+            RN
+          </span>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Rekha&apos;s research lens</p>
+            <h2 className="mt-1 font-bold text-slate-950">Shortlist funds by the job they do</h2>
+            <p className="mt-1 text-sm leading-5 text-slate-600">
+              Funds are framed as goal tools: core growth, stability, liquidity, or satellite exposure.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#7c3aed]">Comparison</p>
+            <h2 className="mt-1 font-bold text-slate-950">Side-by-side shortlist</h2>
+          </div>
+          <span className="rounded-full bg-[#f5f3ff] px-3 py-1 text-xs font-bold text-[#7c3aed]">{compareFunds.length}/3</span>
+        </div>
+        <div className="grid gap-2">
+          {compareFunds.map((fund) => {
+            const returnPct = demoReturnPct(fund);
+            return (
+              <div key={fund.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-2 rounded-2xl bg-slate-50 p-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold text-slate-950">{fund.name}</p>
+                  <p className="text-xs font-semibold text-slate-500">{goalFit(fund)} · {riskLabel(fund.riskLevel)}</p>
+                </div>
+                <strong className={returnPct && returnPct >= 0 ? "text-sm text-[#00a76f]" : "text-sm text-rose-600"}>
+                  {returnPct !== undefined ? `${returnPct >= 0 ? "+" : ""}${returnPct.toFixed(1)}%` : "N/A"}
+                </strong>
+                <button
+                  type="button"
+                  onClick={() => toggleCompare(fund.id)}
+                  aria-label={`Remove ${fund.name} from comparison`}
+                  className="fi-pressable h-8 w-8 rounded-full border border-slate-200 bg-white text-xs font-bold text-slate-500"
+                >
+                  ×
+                </button>
+              </div>
+            );
+          })}
+        </div>
+        <Link href="/advisor-calls" className="fi-pressable mt-4 flex h-11 items-center justify-center rounded-2xl bg-[#7c3aed] text-sm font-bold text-white">
+          Review shortlist with Rekha
+        </Link>
       </section>
 
       <section className="fi-card rounded-3xl border border-[#e4ddff] bg-[#fbfaff] p-4 shadow-sm">
@@ -137,11 +250,12 @@ export function FundsExplorer({ funds }: { funds: Fund[] }) {
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-950">All funds</h2>
-          <span className="text-sm font-semibold text-slate-500">Sorted by demo return</span>
+          <span className="text-sm font-semibold text-slate-500">{filteredFunds.length} shown</span>
         </div>
         <div className="space-y-3">
-          {sortedFunds.map((fund) => {
+          {filteredFunds.map((fund) => {
             const returnPct = demoReturnPct(fund);
+            const selected = compareIds.includes(fund.id);
             return (
               <article key={fund.id} className="fi-card rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
@@ -154,7 +268,12 @@ export function FundsExplorer({ funds }: { funds: Fund[] }) {
                     {riskLabel(fund.riskLevel)}
                   </span>
                 </div>
-                <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-xs leading-5 text-slate-600">{fitCopy(fund)}</p>
+                <div className="mt-3 grid gap-2">
+                  <p className="rounded-2xl bg-slate-50 p-3 text-xs leading-5 text-slate-600">{fitCopy(fund)}</p>
+                  <p className="rounded-2xl bg-[#f8fafc] p-3 text-xs leading-5 text-slate-600">
+                    <strong className="text-slate-900">Why this fund: </strong>{whyThisFund(fund)}
+                  </p>
+                </div>
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   <div>
                     <p className="text-[11px] font-semibold text-slate-500">Return</p>
@@ -167,13 +286,19 @@ export function FundsExplorer({ funds }: { funds: Fund[] }) {
                     <p className="text-sm font-black text-slate-950">₹{fund.inceptionNav}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500">Use case</p>
-                    <p className="text-sm font-black text-slate-950">{fund.assetClass === "equity" ? "Growth" : "Balance"}</p>
+                    <p className="text-[11px] font-semibold text-slate-500">Goal fit</p>
+                    <p className="text-sm font-black text-slate-950">{goalFit(fund)}</p>
                   </div>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-3">
-                  <button type="button" className="fi-pressable h-11 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700">
-                    Add to compare
+                  <button
+                    type="button"
+                    onClick={() => toggleCompare(fund.id)}
+                    className={`fi-pressable h-11 rounded-2xl border text-sm font-bold ${
+                      selected ? "border-[#7c3aed] bg-[#f5f3ff] text-[#7c3aed]" : "border-slate-200 bg-white text-slate-700"
+                    }`}
+                  >
+                    {selected ? "Comparing" : "Add to compare"}
                   </button>
                   <button type="button" className="fi-pressable h-11 rounded-2xl bg-[#7c3aed] text-sm font-bold text-white">
                     Start SIP
