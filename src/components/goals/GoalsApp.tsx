@@ -481,6 +481,27 @@ export function GoalsApp() {
             <p className="mt-1 text-xs leading-5 text-slate-500">Checks whether SIPs are happening.</p>
           </div>
         </section>
+        <section className="fi-card rounded-3xl border border-[#f7e3bf] bg-[linear-gradient(135deg,#fffdf7,#f8fbff)] p-4 shadow-sm">
+          <div className="flex gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-xs font-black text-amber-700">
+              TX
+            </span>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-normal text-amber-700">Before redemption</p>
+              <h2 className="font-bold text-slate-950">Tax and exit-load guide</h2>
+              <p className="mt-1 text-sm leading-5 text-slate-600">
+                When this goal is ready, FundsIndia can explain capital gains tax, exit load, and the cleanest withdrawal order before you redeem.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {["Tax view", "Exit load", "Advisor check"].map((item) => (
+              <div key={item} className="rounded-2xl bg-white p-3 text-center text-[11px] font-bold text-slate-600">
+                {item}
+              </div>
+            ))}
+          </div>
+        </section>
         <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-bold text-slate-950">Contributors</h2>

@@ -75,15 +75,15 @@ export function FundsIndiaHome({ funds }: { funds: Fund[] }) {
 
   return (
     <div className="fi-screen space-y-6 px-4 pb-28">
-      <section className="fi-card overflow-hidden rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_58%,#ffffff_100%)] p-5 shadow-sm">
-        <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Home</p>
-        <h1 className="mt-2 text-3xl font-black leading-tight text-slate-950">Portfolio confidence</h1>
+      <section className="fi-card overflow-hidden rounded-[28px] bg-[#0b1220] p-5 text-white shadow-lg shadow-slate-950/10">
+        <p className="text-xs font-bold uppercase tracking-normal text-[#7dd3fc]">Home</p>
+        <h1 className="mt-2 text-3xl font-black leading-tight">Portfolio confidence</h1>
         <div className="mt-3 flex items-end justify-between gap-4">
           <div>
-            <p className="text-2xl font-black leading-tight text-slate-950">{rupee(latest.totalValue)}</p>
-            <p className="mt-1 text-sm text-slate-600">Total mutual fund portfolio value</p>
+            <p className="text-2xl font-black leading-tight">{rupee(latest.totalValue)}</p>
+            <p className="mt-1 text-sm text-slate-300">Total mutual fund portfolio value</p>
           </div>
-          <span className={`rounded-full px-3 py-1 text-xs font-bold ${change >= 0 ? "bg-[#ecfff7] text-[#00a76f]" : "bg-rose-50 text-rose-600"}`}>
+          <span className={`rounded-full px-3 py-1 text-xs font-bold ${change >= 0 ? "bg-[#123c37] text-[#7cf8cf]" : "bg-rose-950 text-rose-200"}`}>
             {change >= 0 ? "+" : ""}
             {changePct.toFixed(2)}%
           </span>
@@ -94,9 +94,9 @@ export function FundsIndiaHome({ funds }: { funds: Fund[] }) {
             ["7", "Funds held"],
             ["₹62K", "Monthly SIP"],
           ].map(([value, label]) => (
-            <div key={label} className="rounded-2xl bg-white/85 p-3 shadow-sm">
-              <strong className="block text-lg font-black text-slate-950">{value}</strong>
-              <span className="text-[11px] font-semibold leading-4 text-slate-500">{label}</span>
+            <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
+              <strong className="block text-lg font-black text-white">{value}</strong>
+              <span className="text-[11px] font-semibold leading-4 text-slate-300">{label}</span>
             </div>
           ))}
         </div>
@@ -155,6 +155,53 @@ export function FundsIndiaHome({ funds }: { funds: Fund[] }) {
               <p className="mt-1 text-xs leading-5 text-slate-500">{copy}</p>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-[#d8e7f5] bg-[linear-gradient(135deg,#ffffff,#f3f8ff)] p-4 shadow-sm">
+        <div className="flex items-start gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-black text-[#006bff]">
+            AI
+          </span>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Ask before acting</p>
+            <h2 className="mt-1 font-bold text-slate-950">Get matched to trusted guidance</h2>
+            <p className="mt-1 text-sm leading-5 text-slate-600">
+              Ask a money question. FundsIndia checks existing expert answers first, then suggests an advisor call if the question needs context.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 rounded-2xl bg-white p-3">
+          <p className="text-sm font-bold text-slate-950">“Should I increase SIP after my raise?”</p>
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            Matched to SIP guidance, goal impact, and an optional call with Rekha.
+          </p>
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <Link href="/summary" className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700">
+            See answers
+          </Link>
+          <Link href="/advisor-calls" className="fi-pressable flex h-11 items-center justify-center rounded-2xl bg-[#006bff] text-sm font-bold text-white">
+            Ask Rekha
+          </Link>
+        </div>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-[#caefe3] bg-white p-4 shadow-sm">
+        <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Income-aware SIP</p>
+        <h2 className="mt-1 font-bold text-slate-950">Salary update could move goals faster</h2>
+        <p className="mt-1 text-sm leading-5 text-slate-600">
+          If monthly surplus rose by ₹18K, increasing SIP by ₹9K could bring the education goal forward by 11 months.
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl bg-[#ecfff7] p-3">
+            <p className="text-[11px] font-bold uppercase tracking-normal text-[#00a76f]">Current SIP</p>
+            <p className="mt-1 text-lg font-black text-slate-950">₹62K</p>
+          </div>
+          <div className="rounded-2xl bg-[#eef7ff] p-3">
+            <p className="text-[11px] font-bold uppercase tracking-normal text-[#006bff]">Suggested</p>
+            <p className="mt-1 text-lg font-black text-slate-950">₹71K</p>
+          </div>
         </div>
       </section>
 

@@ -1,50 +1,49 @@
 # FundsIndia B2C Features
 
-A mobile-first FundsIndia prototype focused on guided investing features for mass affluent mutual fund investors.
+A mobile-first FundsIndia prototype for mass affluent mutual fund investors.
 
-The current feature slice is **Advisor Calls**: a scheduling and meeting-prep flow that helps investors request guidance, explain what they need, generate advisor context, choose an advisor, pick a time, and review previous call summaries.
+The app explores how FundsIndia could build trust and confidence through goals, advisor access, fund discovery, portfolio guidance, and family-oriented investing workflows.
 
 ## Current Prototype
 
-The app opens to:
+The app currently includes these primary surfaces:
 
-```text
-/advisor-calls
-```
+- **Home** (`/dashboard`) - portfolio confidence dashboard with allocation guardrails, next best actions, trusted guidance routing, income-aware SIP suggestions, advisor prompts, and fund review cards.
+- **Funds** (`/funds`) - mutual fund research desk with risk labels, expense ratios, use-case guidance, comparison actions, SIP CTAs, advisor-reviewed shortlists, and transfer-in concierge concept.
+- **Goals** (`/goals`) - goal planning dashboard with active/past goals, collaborative contributor flows, goal creation, portfolio value line charts, progress indicators, advisor handoff, and redemption tax/exit-load guidance.
+- **Advisor Calls** (`/advisor-calls`) - calm advisory scheduling flow with reason capture, advisor context, calendar-based time suggestions, previous discussion memory, and advisor briefing.
+- **Summary** (`/summary`) - inherited AI portfolio summary surface from the original prototype backbone.
+- **Settings** (`/settings`) - basic settings surface.
 
-The Advisor Calls flow includes:
+## Product Direction
 
-- Advisor Calls home screen
-- Suggested reason to speak with an advisor
-- Upcoming call card
-- Previous conversation memory
-- Topic selection
-- Investor context note
-- AI-style advisor brief
-- Advisor selection
-- Time slot selection
-- Calendar connection state
-- Booking review
-- Scheduled call confirmation
-- Past call summary detail
+This prototype is based on the idea that mass affluent investors do not only need transaction tools. They need reassurance, reliable guidance, and a product that makes investing feel understandable and safe.
 
-## Why This Exists
+The current build focuses on:
 
-The product direction is based on the idea that mass affluent investors do not only need more investing tools. They need confidence, trust, and clear guidance before making financial decisions.
+- confidence instead of feature clutter
+- goal-based mutual fund investing
+- human advisor access
+- context-aware AI guidance
+- collaborative family/couple investing
+- clearer fund selection
+- tax and redemption clarity
+- easier transfer of external assets into FundsIndia
 
-This prototype explores how FundsIndia could make advisor access feel:
+## Implemented Feature Ideas
 
-- easy to find
-- emotionally reassuring
-- context-aware
-- useful for both investor and advisor
-- connected to goals, SIPs, and prior conversations
+From the mass affluent product proposal, the prototype now covers:
 
-## Project Backbone
-
-This repo was bootstrapped from an earlier FundsIndia AI-summary prototype so it could reuse the existing mobile app shell, seeded portfolio data, styling conventions, and Next.js structure.
-
-The older dashboard and summary routes still exist as supporting backbone screens, but the active feature focus is Advisor Calls.
+- Easy advisor call scheduling
+- Previous call summaries and discussion history
+- AI-style context capture before advisor calls
+- Calendar-aware suggested time slots
+- Collaborative goals for couples/families
+- SIP uplift suggestions when income changes
+- Trusted-answer routing before escalating to an advisor call
+- Goal redemption tax and exit-load guidance
+- Transfer-in concierge concept for external assets
+- Better Home and Funds pages for investor confidence
 
 ## Tech Stack
 
@@ -52,7 +51,7 @@ The older dashboard and summary routes still exist as supporting backbone screen
 - React
 - TypeScript
 - Tailwind CSS
-- Seeded demo data
+- Seeded demo portfolio/fund data
 
 ## Getting Started
 
@@ -71,7 +70,7 @@ npm run dev
 Open:
 
 ```text
-http://localhost:3000/advisor-calls
+http://localhost:3000/dashboard
 ```
 
 Build for production:
@@ -98,21 +97,20 @@ npm run seed
 ## Important Files
 
 ```text
+src/app/dashboard/page.tsx
+src/app/funds/page.tsx
+src/app/goals/page.tsx
 src/app/advisor-calls/page.tsx
+src/components/dashboard/FundsIndiaHome.tsx
+src/components/funds/FundsExplorer.tsx
+src/components/goals/GoalsApp.tsx
 src/components/advisor/AdvisorCallsApp.tsx
 src/components/shell/AppShell.tsx
 src/components/shell/SidebarDrawer.tsx
-src/app/page.tsx
-```
-
-The static design references from the earlier design phase are in:
-
-```text
-outputs/
 ```
 
 ## Notes
 
-This is a prototype. It does not connect to real FundsIndia accounts, advisor calendars, mutual fund transactions, or production user data.
+This is a prototype. It does not connect to real FundsIndia accounts, advisor calendars, bank accounts, income data, mutual fund transactions, tax systems, or production user data.
 
-The advisor brief and calendar behavior are mocked to demonstrate the intended product experience.
+All portfolio, fund, SIP, advisor, transfer, and tax guidance behavior is mocked to demonstrate the intended product experience.
