@@ -1,22 +1,28 @@
-import type { Fund } from "@/lib/data/types";
-import { getNavRangeForFund } from "@/lib/data/repository";
+import Link from "next/link";
+import type { AssetClass, Fund } from "@/lib/data/types";
+import { getNavRangeForFund, getSnapshots } from "@/lib/data/repository";
 
-const PRODUCTS = [
-  { label: "Mutual Funds", icon: "₹" },
-  { label: "Stocks", icon: "📈" },
-];
+const ASSET_LABEL: Record<AssetClass, string> = {
+  equity: "Equity",
+  debt: "Debt",
+  international: "International",
+  liquid: "Liquid",
+  gold: "Gold",
+};
 
-/** Deterministic (no Math.random()) string hash with an avalanche finalizer
- * (FNV-1a + a murmur3-style bit mix), so a given fund always shows the same
- * synthesized investor count / rating. The finalizer matters here: this
- * app's fund ids are sequential ("FI-001".."FI-007"), and a plain polynomial
- * hash without one leaves near-identical inputs producing near-identical
- * outputs — every fund would cluster in the same narrow band. */
+const ASSET_COLOR: Record<AssetClass, string> = {
+  equity: "bg-[#006bff]",
+  debt: "bg-[#00a76f]",
+  international: "bg-[#7c3aed]",
+  liquid: "bg-[#0f766e]",
+  gold: "bg-[#d97706]",
+};
+
 function hashString(input: string): number {
-  let hash = 2166136261; // FNV-1a offset basis
+  let hash = 2166136261;
   for (let i = 0; i < input.length; i++) {
     hash ^= input.charCodeAt(i);
-    hash = Math.imul(hash, 16777619); // FNV prime
+    hash = Math.imul(hash, 16777619);
   }
   hash ^= hash >>> 15;
   hash = Math.imul(hash, 0x2c1b3c6d);
@@ -26,138 +32,180 @@ function hashString(input: string): number {
   return hash >>> 0;
 }
 
-/** Deterministic pseudo investor count in the 20K-90K range, formatted like "62.4K INVESTORS". */
 function investorCountLabel(fund: Fund): string {
   const hash = hashString(fund.id);
-  const thousands = 20 + (hash % 701) / 10; // 20.0 - 90.0
-  return `${thousands.toFixed(1)}K INVESTORS`;
+  const thousands = 20 + (hash % 701) / 10;
+  return `${thousands.toFixed(1)}K investors`;
 }
 
-/** Deterministic 4-or-5 star rating derived from the fund's risk level + id. */
 function starRating(fund: Fund): number {
   const hash = hashString(fund.id + fund.riskLevel);
-  return 4 + (hash % 2); // 4 or 5
+  return 4 + (hash % 2);
 }
 
-/** "Since inception (demo)" return: earliest vs. latest NAV in the seeded
- * history window for this fund. Explicitly labeled as a demo figure so it
- * doesn't imply a real 3-year return — see plan Task 18 visual spec. */
 function demoReturnPct(fund: Fund): number | undefined {
   const range = getNavRangeForFund(fund.id);
-  if (!range) return undefined;
-  const { first, last } = range;
-  if (first.nav <= 0) return undefined;
-  return ((last.nav - first.nav) / first.nav) * 100;
+  if (!range || range.first.nav <= 0) return undefined;
+  return ((range.last.nav - range.first.nav) / range.first.nav) * 100;
+}
+
+function rupee(value: number) {
+  if (value >= 10000000) return `₹${(value / 10000000).toFixed(1)}Cr`;
+  if (value >= 100000) return `₹${(value / 100000).toFixed(1)}L`;
+  return `₹${Math.round(value).toLocaleString("en-IN")}`;
+}
+
+function riskLabel(fund: Fund) {
+  return fund.riskLevel
+    .split(" ")
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 export function FundsIndiaHome({ funds }: { funds: Fund[] }) {
-  // Lead with what's actually performing well — a real recommendation module
-  // wouldn't feature a fund that's currently down. Rank across all funds
-  // (not just equity) by their real demo return so the row surfaces genuine
-  // strong performers rather than an arbitrary asset-class slice.
+  const snapshots = getSnapshots();
+  const latest = snapshots[snapshots.length - 1];
+  const previous = snapshots[Math.max(0, snapshots.length - 2)];
+  const change = latest.totalValue - previous.totalValue;
+  const changePct = previous.totalValue > 0 ? (change / previous.totalValue) * 100 : 0;
   const recommended = [...funds]
     .sort((a, b) => (demoReturnPct(b) ?? -Infinity) - (demoReturnPct(a) ?? -Infinity))
-    .slice(0, 4);
+    .slice(0, 3);
+  const sipReady = funds.filter((fund) => fund.riskLevel === "low" || fund.riskLevel === "moderate").slice(0, 2);
 
   return (
-    <div className="space-y-6 px-4 pb-24">
-      {/* Promo */}
-      <div className="flex items-center justify-between rounded-3xl bg-emerald-50 p-5">
-        <div className="pr-3">
-          <p className="text-lg font-bold text-slate-900">You&apos;re ready to invest!</p>
-          <p className="mt-1 text-sm text-slate-600">
-            Pick your fund, set up your SIP and relax. We&apos;ll guide you all the way.
-          </p>
-          <button className="mt-3 rounded-full bg-emerald-600 px-5 py-2 text-sm font-medium text-white">
-            Start now
-          </button>
+    <div className="fi-screen space-y-6 px-4 pb-28">
+      <section className="fi-card overflow-hidden rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_58%,#ffffff_100%)] p-5 shadow-sm">
+        <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Home</p>
+        <h1 className="mt-2 text-3xl font-black leading-tight text-slate-950">Portfolio confidence</h1>
+        <div className="mt-3 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-2xl font-black leading-tight text-slate-950">{rupee(latest.totalValue)}</p>
+            <p className="mt-1 text-sm text-slate-600">Total mutual fund portfolio value</p>
+          </div>
+          <span className={`rounded-full px-3 py-1 text-xs font-bold ${change >= 0 ? "bg-[#ecfff7] text-[#00a76f]" : "bg-rose-50 text-rose-600"}`}>
+            {change >= 0 ? "+" : ""}
+            {changePct.toFixed(2)}%
+          </span>
         </div>
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-2xl font-semibold text-white">
-          ₹
-        </div>
-      </div>
-
-      {/* Products */}
-      <div>
-        <h2 className="mb-3 text-lg font-bold text-slate-900">Products</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {PRODUCTS.map((p) => (
-            <div key={p.label} className="rounded-2xl border border-slate-200 bg-white p-4">
-              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 text-white">
-                {p.icon}
-              </div>
-              <p className="text-sm font-medium text-slate-800">{p.label}</p>
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          {[
+            ["92", "Confidence score"],
+            ["7", "Funds held"],
+            ["₹62K", "Monthly SIP"],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-2xl bg-white/85 p-3 shadow-sm">
+              <strong className="block text-lg font-black text-slate-950">{value}</strong>
+              <span className="text-[11px] font-semibold leading-4 text-slate-500">{label}</span>
             </div>
           ))}
         </div>
-        <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4">
-          <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 text-white">
-            🦊
-          </div>
-          <p className="text-sm font-medium text-slate-800">SIF</p>
-        </div>
-      </div>
+      </section>
 
-      {/* Recommended */}
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">Recommended Funds</h2>
-          <span className="text-sm font-medium text-slate-500">View All</span>
+      <section className="grid grid-cols-2 gap-3">
+        <Link href="/goals" className="fi-card fi-pressable rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-black text-[#006bff]">GL</span>
+          <h2 className="mt-4 font-bold text-slate-950">Goals on track</h2>
+          <p className="mt-1 text-sm leading-5 text-slate-500">2 active plans, 1 needs attention.</p>
+        </Link>
+        <Link href="/advisor-calls" className="fi-card fi-pressable rounded-3xl border border-[#d8e7f5] bg-white p-4 shadow-sm">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#eef5ff] text-xs font-black text-[#0f4c81]">RN</span>
+          <h2 className="mt-4 font-bold text-slate-950">Advisor ready</h2>
+          <p className="mt-1 text-sm leading-5 text-slate-500">Rekha can review your next move.</p>
+        </Link>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Allocation guardrail</p>
+            <h2 className="mt-1 font-bold text-slate-950">Diversified, slightly equity-led</h2>
+          </div>
+          <span className="rounded-full bg-[#ecfff7] px-3 py-1 text-xs font-bold text-[#00a76f]">Healthy</span>
         </div>
-        <div className="flex gap-3 overflow-x-auto pb-2">
-          {recommended.map((f) => {
-            const returnPct = demoReturnPct(f);
-            const rating = starRating(f);
+        <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-slate-100">
+          {(Object.entries(latest.allocation) as [AssetClass, number][]).map(([assetClass, percent]) => (
+            <div key={assetClass} className={`${ASSET_COLOR[assetClass]} h-full`} style={{ width: `${percent}%` }} title={`${ASSET_LABEL[assetClass]} ${percent}%`} />
+          ))}
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2">
+          {(Object.entries(latest.allocation) as [AssetClass, number][]).map(([assetClass, percent]) => (
+            <div key={assetClass} className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+              <span className={`h-2.5 w-2.5 rounded-full ${ASSET_COLOR[assetClass]}`} />
+              <span>{ASSET_LABEL[assetClass]}</span>
+              <span className="ml-auto text-slate-900">{percent}%</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-bold text-slate-950">Next best actions</h2>
+          <span className="text-xs font-bold text-slate-500">This week</span>
+        </div>
+        <div className="space-y-3">
+          {[
+            ["Review home goal shortfall", "Projection is behind target by about ₹6.4L.", "/goals"],
+            ["Keep SIPs unchanged", "Current SIP behavior supports long-term plans.", "/summary"],
+            ["Discuss surplus allocation", "Ask Rekha before deploying new cash.", "/advisor-calls"],
+          ].map(([title, copy, href]) => (
+            <Link key={title} href={href} className="fi-pressable block rounded-2xl bg-slate-50 p-3">
+              <p className="text-sm font-bold text-slate-950">{title}</p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">{copy}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-950">Funds worth reviewing</h2>
+          <Link href="/funds" className="fi-pressable rounded-xl px-2 py-1 text-sm font-bold text-[#006bff]">
+            View all
+          </Link>
+        </div>
+        <div className="space-y-3">
+          {recommended.map((fund) => {
+            const returnPct = demoReturnPct(fund);
             return (
-              <div
-                key={f.id}
-                className="w-56 shrink-0 rounded-2xl border border-slate-200 bg-white p-4"
-              >
-                <div className="mb-2 flex items-center justify-between">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500 text-sm font-semibold text-white">
-                    ₹
+              <Link key={fund.id} href="/funds" className="fi-card fi-pressable block rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">{fund.category}</p>
+                    <h3 className="mt-1 font-bold leading-5 text-slate-950">{fund.name}</h3>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">
+                      {riskLabel(fund)} risk · {fund.expenseRatio}% expense · {investorCountLabel(fund)}
+                    </p>
                   </div>
-                  <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
-                    👥 {investorCountLabel(f)}
+                  <span className="shrink-0 rounded-full bg-amber-50 px-2 py-1 text-xs font-bold text-amber-600">
+                    {"★".repeat(starRating(fund))}
                   </span>
                 </div>
-
-                <p className="line-clamp-2 text-sm font-bold text-slate-900">{f.name}</p>
-
-                <p className="mt-1 text-xs text-amber-500">
-                  {"★".repeat(rating)}
-                  {"☆".repeat(5 - rating)}
-                </p>
-
-                {returnPct !== undefined ? (
-                  <div className="mt-2">
-                    <p className={`text-lg font-bold ${returnPct >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
-                      {returnPct >= 0 ? "+" : ""}
-                      {returnPct.toFixed(2)}%
-                    </p>
-                    <p className="text-[11px] text-slate-500">Since inception (demo)</p>
-                  </div>
-                ) : (
-                  <p className="mt-2 text-xs text-slate-500">Add to start investing</p>
-                )}
-
-                <div className="mt-3 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-sm text-slate-500">
-                    🛒
-                  </div>
-                  <button
-                    type="button"
-                    aria-label={`Add ${f.name}`}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-700 text-sm font-bold text-white"
-                  >
-                    +
-                  </button>
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-500">Demo return window</span>
+                  <strong className={returnPct && returnPct >= 0 ? "text-sm text-[#00a76f]" : "text-sm text-rose-600"}>
+                    {returnPct !== undefined ? `${returnPct >= 0 ? "+" : ""}${returnPct.toFixed(2)}%` : "N/A"}
+                  </strong>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
-      </div>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-[#d8e7f5] bg-[linear-gradient(135deg,#ffffff,#f3f8ff)] p-4 shadow-sm">
+        <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">SIP watchlist</p>
+        <h2 className="mt-1 font-bold text-slate-950">Lower-volatility funds for planned investing</h2>
+        <div className="mt-3 grid gap-2">
+          {sipReady.map((fund) => (
+            <div key={fund.id} className="rounded-2xl bg-white p-3">
+              <p className="text-sm font-bold text-slate-950">{fund.name}</p>
+              <p className="mt-1 text-xs font-semibold text-slate-500">{fund.category} · {riskLabel(fund)} risk</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

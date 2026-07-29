@@ -6,13 +6,13 @@ import { getUser } from "@/lib/data/repository";
 
 const WIRED = [
   { label: "Dashboard", href: "/dashboard", icon: "▦" },
+  { label: "Mutual Funds", href: "/funds", icon: "MF" },
   { label: "Goals", href: "/goals", icon: "◎" },
   { label: "Advisor Calls", href: "/advisor-calls", icon: "A" },
   { label: "Summary", href: "/summary", icon: "S" },
   { label: "Settings", href: "/settings", icon: "⚙" },
 ];
 const PLACEHOLDERS = [
-  { label: "Mutual Funds", icon: "MF" },
   { label: "My Systematic Plans", icon: "SP" },
   { label: "Nominees", icon: "NM" },
   { label: "Bank Details", icon: "BD" },

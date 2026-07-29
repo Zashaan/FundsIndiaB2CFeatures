@@ -10,7 +10,7 @@ import { SidebarDrawer } from "./SidebarDrawer";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/dashboard", icon: "⌂" },
-  { label: "Funds", href: "/dashboard", icon: "₹" },
+  { label: "Funds", href: "/funds", icon: "₹" },
   { label: "Goals", href: "/goals", icon: "◎" },
   { label: "Advisor", href: "/advisor-calls", icon: "☎" },
 ];

@@ -27,6 +27,12 @@ type Contributor = {
   initials: string;
 };
 
+type GoalValuePoint = {
+  label: string;
+  value: number;
+  kind: "actual" | "projected";
+};
+
 type Goal = {
   id: string;
   name: string;
@@ -39,6 +45,7 @@ type Goal = {
   status: GoalStatus;
   contributors: Contributor[];
   recentActivity: string[];
+  valueHistory: GoalValuePoint[];
 };
 
 type GoalCategory = {
@@ -81,6 +88,18 @@ const initialGoals: Goal[] = [
       { id: "spouse", name: "Ananya", role: "Accepted", amount: "₹20,000/mo", initials: "AS" },
     ],
     recentActivity: ["Ritik SIP credited: ₹42,000", "Ananya added ₹20,000", "Goal projection updated"],
+    valueHistory: [
+      { label: "Jan", value: 1240000, kind: "actual" },
+      { label: "Feb", value: 1325000, kind: "actual" },
+      { label: "Mar", value: 1450000, kind: "actual" },
+      { label: "Apr", value: 1538000, kind: "actual" },
+      { label: "May", value: 1642000, kind: "actual" },
+      { label: "Jun", value: 1735000, kind: "actual" },
+      { label: "Jul", value: 1830000, kind: "actual" },
+      { label: "Dec", value: 2320000, kind: "projected" },
+      { label: "2030", value: 3180000, kind: "projected" },
+      { label: "2034", value: 4510000, kind: "projected" },
+    ],
   },
   {
     id: "home",
@@ -94,6 +113,18 @@ const initialGoals: Goal[] = [
     status: "active",
     contributors: [{ id: "owner", name: "Ritik", role: "Owner", amount: "₹28,000/mo", initials: "RB" }],
     recentActivity: ["SIP credited: ₹28,000", "Projected shortfall increased by ₹1.8L"],
+    valueHistory: [
+      { label: "Jan", value: 610000, kind: "actual" },
+      { label: "Feb", value: 655000, kind: "actual" },
+      { label: "Mar", value: 724000, kind: "actual" },
+      { label: "Apr", value: 792000, kind: "actual" },
+      { label: "May", value: 841000, kind: "actual" },
+      { label: "Jun", value: 895000, kind: "actual" },
+      { label: "Jul", value: 940000, kind: "actual" },
+      { label: "Dec", value: 1220000, kind: "projected" },
+      { label: "2028", value: 2050000, kind: "projected" },
+      { label: "2029", value: 2860000, kind: "projected" },
+    ],
   },
   {
     id: "emergency",
@@ -107,6 +138,14 @@ const initialGoals: Goal[] = [
     status: "past",
     contributors: [{ id: "owner", name: "Ritik", role: "Owner", amount: "Completed", initials: "RB" }],
     recentActivity: ["Goal completed", "Moved to liquid fund"],
+    valueHistory: [
+      { label: "Aug", value: 180000, kind: "actual" },
+      { label: "Sep", value: 250000, kind: "actual" },
+      { label: "Oct", value: 330000, kind: "actual" },
+      { label: "Nov", value: 420000, kind: "actual" },
+      { label: "Dec", value: 515000, kind: "actual" },
+      { label: "Jan", value: 600000, kind: "actual" },
+    ],
   },
 ];
 
@@ -227,24 +266,107 @@ function GoalCard({ goal, onOpen }: { goal: Goal; onOpen: () => void }) {
   );
 }
 
-function MiniGraph({ goal }: { goal: Goal }) {
-  const pct = progress(goal);
-  const projected = goal.projectedStatus === "Behind" ? 70 : goal.projectedStatus === "Ahead" ? 100 : 88;
+function buildGoalHistory(goal: Goal): GoalValuePoint[] {
+  if (goal.valueHistory.length) return goal.valueHistory;
+
+  const halfway = Math.max(goal.currentAmount * 0.72, goal.currentAmount - 240000);
+  const projected = goal.projectedStatus === "Behind" ? goal.targetAmount * 0.82 : goal.targetAmount * 1.01;
+
+  return [
+    { label: "Start", value: Math.max(0, goal.currentAmount * 0.45), kind: "actual" },
+    { label: "Q1", value: halfway, kind: "actual" },
+    { label: "Now", value: goal.currentAmount, kind: "actual" },
+    { label: "Next", value: (goal.currentAmount + projected) / 2, kind: "projected" },
+    { label: "Target", value: projected, kind: "projected" },
+  ];
+}
+
+function linePath(points: { x: number; y: number }[]) {
+  return points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
+}
+
+function PortfolioValueChart({ goal }: { goal: Goal }) {
+  const data = buildGoalHistory(goal);
+  const width = 320;
+  const height = 164;
+  const paddingX = 20;
+  const paddingTop = 18;
+  const paddingBottom = 34;
+  const maxValue = Math.max(goal.targetAmount, ...data.map((point) => point.value)) * 1.08;
+  const minValue = Math.min(0, ...data.map((point) => point.value));
+  const plotHeight = height - paddingTop - paddingBottom;
+  const plotWidth = width - paddingX * 2;
+  const scaleX = (index: number) => paddingX + (plotWidth * index) / Math.max(1, data.length - 1);
+  const scaleY = (value: number) => paddingTop + ((maxValue - value) / Math.max(1, maxValue - minValue)) * plotHeight;
+  const points = data.map((point, index) => ({ ...point, x: scaleX(index), y: scaleY(point.value) }));
+  const actualPoints = points.filter((point) => point.kind === "actual");
+  const projectedPoints = points.slice(Math.max(0, actualPoints.length - 1));
+  const targetY = scaleY(goal.targetAmount);
+  const latest = data.findLast((point) => point.kind === "actual") ?? data[data.length - 1];
+  const first = data[0];
+  const change = latest.value - first.value;
+  const changePct = first.value > 0 ? (change / first.value) * 100 : 0;
 
   return (
     <div className="fi-card rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-bold text-slate-950">Progress trajectory</h2>
-        <span className="text-xs font-bold text-slate-500">Projected vs target</span>
+        <div>
+          <h2 className="font-bold text-slate-950">Portfolio value over time</h2>
+          <p className="mt-1 text-xs font-semibold text-slate-500">Actual history with projected path to target.</p>
+        </div>
+        <span className="rounded-full bg-[#ecfff7] px-2.5 py-1 text-xs font-bold text-[#00a76f]">
+          +{changePct.toFixed(1)}%
+        </span>
       </div>
-      <div className="relative h-36 rounded-3xl bg-[linear-gradient(180deg,#f8fbff,#f2fff8)] p-4">
-        <div className="absolute left-5 right-5 top-7 border-t border-dashed border-[#006bff]/50" />
-        <div className="absolute bottom-8 left-5 right-5 h-2 rounded-full bg-white shadow-inner" />
-        <div className="fi-progress absolute bottom-8 left-5 h-2 rounded-full bg-[linear-gradient(90deg,#00c781,#006bff)]" style={{ width: `${pct * 0.78}%` }} />
-        <div className="absolute bottom-8 left-5 h-10 border-l-2 border-[#00a76f] transition-[left] duration-500 ease-out" style={{ left: `${18 + pct * 0.62}%` }} />
-        <div className="absolute bottom-8 left-5 h-24 border-l-2 border-dashed border-[#006bff] transition-[left] duration-500 ease-out" style={{ left: `${18 + projected * 0.62}%` }} />
-        <div className="absolute bottom-2 left-5 text-[11px] font-semibold text-slate-500">Today</div>
-        <div className="absolute bottom-2 right-5 text-[11px] font-semibold text-slate-500">Target</div>
+      <div className="rounded-3xl bg-[linear-gradient(180deg,#f8fbff,#f2fff8)] px-2 pt-3">
+        <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${goal.name} portfolio value line graph`} className="h-44 w-full overflow-visible">
+          <defs>
+            <linearGradient id={`goal-line-${goal.id}`} x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0%" stopColor="#00a76f" />
+              <stop offset="100%" stopColor="#006bff" />
+            </linearGradient>
+            <linearGradient id={`goal-area-${goal.id}`} x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#00a76f" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#006bff" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          {[0, 1, 2].map((line) => {
+            const y = paddingTop + (plotHeight * line) / 2;
+            return <line key={line} x1={paddingX} x2={width - paddingX} y1={y} y2={y} stroke="#dbe7f3" strokeWidth="1" />;
+          })}
+          <line x1={paddingX} x2={width - paddingX} y1={targetY} y2={targetY} stroke="#006bff" strokeDasharray="5 5" strokeWidth="1.5" />
+          <text x={width - paddingX} y={targetY - 6} textAnchor="end" className="fill-[#006bff] text-[10px] font-bold">
+            Target {rupee(goal.targetAmount)}
+          </text>
+          <path
+            d={`${linePath(actualPoints)} L ${actualPoints[actualPoints.length - 1].x.toFixed(1)} ${height - paddingBottom} L ${actualPoints[0].x.toFixed(1)} ${height - paddingBottom} Z`}
+            fill={`url(#goal-area-${goal.id})`}
+          />
+          <path d={linePath(actualPoints)} fill="none" stroke={`url(#goal-line-${goal.id})`} strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" />
+          <path d={linePath(projectedPoints)} fill="none" stroke="#006bff" strokeDasharray="6 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
+          {points.map((point) => (
+            <g key={`${point.label}-${point.kind}`}>
+              <circle cx={point.x} cy={point.y} r={point.kind === "actual" ? 4.5 : 3.5} fill={point.kind === "actual" ? "#00a76f" : "#ffffff"} stroke={point.kind === "actual" ? "#ffffff" : "#006bff"} strokeWidth="2" />
+              <text x={point.x} y={height - 12} textAnchor="middle" className="fill-slate-500 text-[10px] font-semibold">
+                {point.label}
+              </text>
+            </g>
+          ))}
+        </svg>
+        <div className="grid grid-cols-3 gap-2 border-t border-white/70 px-2 py-3">
+          <div>
+            <p className="text-[11px] font-semibold text-slate-500">Start</p>
+            <p className="text-sm font-black text-slate-950">{rupee(first.value)}</p>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold text-slate-500">Current</p>
+            <p className="text-sm font-black text-slate-950">{rupee(latest.value)}</p>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold text-slate-500">Target</p>
+            <p className="text-sm font-black text-slate-950">{rupee(goal.targetAmount)}</p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -300,6 +422,20 @@ export function GoalsApp() {
       status: "active",
       contributors: [{ id: "owner", name: "Ritik", role: "Owner", amount: `${rupee(sipAmount)}/mo`, initials: "RB" }],
       recentActivity: ["Goal created", `${frequency} SIP planned: ${rupee(sipAmount)}`],
+      valueHistory: buildGoalHistory({
+        id,
+        name: goalCategory.label,
+        category: goalCategory.label,
+        targetAmount: goalCategory.defaultTarget,
+        currentAmount: initialInvestment,
+        targetDate: `Jul ${2026 + horizonYears}`,
+        projectedStatus: projectedOutcome >= goalCategory.defaultTarget ? "On track" : "Behind",
+        adherenceStatus: "On schedule",
+        status: "active",
+        contributors: [],
+        recentActivity: [],
+        valueHistory: [],
+      }),
     };
     setGoals((current) => [newGoal, ...current]);
     setSelectedGoalId(id);
@@ -332,7 +468,7 @@ export function GoalsApp() {
             </span>
           </div>
         </section>
-        <MiniGraph goal={selectedGoal} />
+        <PortfolioValueChart goal={selectedGoal} />
         <section className="grid grid-cols-2 gap-3">
           <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Projected completion</p>
