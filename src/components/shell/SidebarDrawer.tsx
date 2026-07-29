@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getUser } from "@/lib/data/repository";
+import { useTheme } from "@/lib/theme/themeContext";
 
 const WIRED = [
   { label: "Dashboard", href: "/dashboard", icon: "▦" },
@@ -23,6 +24,8 @@ const PLACEHOLDERS = [
 
 export function SidebarDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const user = getUser();
+  const { isDark, toggleTheme } = useTheme();
+
   return (
     <div className={`fixed inset-0 z-40 ${open ? "" : "pointer-events-none"}`}>
       <div
@@ -47,6 +50,36 @@ export function SidebarDrawer({ open, onClose }: { open: boolean; onClose: () =>
             Advisory access enabled
           </div>
         </div>
+
+        <section className="mb-4 rounded-3xl border border-slate-200 bg-white p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Appearance</p>
+              <h3 className="mt-1 font-bold text-slate-900">{isDark ? "Dark mode" : "Light mode"}</h3>
+            </div>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              role="switch"
+              aria-checked={isDark}
+              aria-label="Toggle dark mode"
+              className={`fi-theme-toggle fi-pressable relative h-8 w-14 rounded-full p-1 transition-colors ${
+                isDark ? "bg-[#006bff]" : "bg-slate-300"
+              }`}
+            >
+              <span
+                className={`flex h-6 w-6 items-center justify-center rounded-full bg-white text-[11px] font-black shadow-sm transition-transform ${
+                  isDark ? "translate-x-6 text-[#006bff]" : "text-amber-500"
+                }`}
+              >
+                {isDark ? "M" : "S"}
+              </span>
+            </button>
+          </div>
+          <p className="mt-2 text-xs leading-5 text-slate-500">
+            Switch the full app to a calmer low-light view.
+          </p>
+        </section>
 
         <nav className="space-y-1">
           {WIRED.map((item) => (

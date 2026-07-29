@@ -142,6 +142,92 @@ body {
   animation: fi-soft-pulse 3.6s ease-in-out infinite;
 }
 
+[data-theme="dark"] body {
+  background: #050b16;
+  color: #e5eefb;
+}
+
+[data-theme="dark"] .fi-app-shell {
+  background: #07111f !important;
+  box-shadow: 0 0 0 1px rgb(148 163 184 / 0.12);
+}
+
+[data-theme="dark"] header,
+[data-theme="dark"] nav,
+[data-theme="dark"] aside,
+[data-theme="dark"] .fi-bottom-sheet {
+  background-color: rgb(10 18 32 / 0.96) !important;
+  border-color: rgb(71 85 105 / 0.58) !important;
+}
+
+[data-theme="dark"] .fi-card,
+[data-theme="dark"] [class*="bg-white"],
+[data-theme="dark"] [class*="bg-slate-50"],
+[data-theme="dark"] [class*="bg-slate-100"],
+[data-theme="dark"] [class*="bg-[#f"],
+[data-theme="dark"] [class*="bg-[#e"] {
+  background: #0d1728 !important;
+  border-color: rgb(71 85 105 / 0.7) !important;
+}
+
+[data-theme="dark"] [class*="bg-[#ecfbf4"],
+[data-theme="dark"] [class*="bg-[#ecfff7"],
+[data-theme="dark"] [class*="bg-[#eef7ff"],
+[data-theme="dark"] [class*="bg-[#eef5ff"],
+[data-theme="dark"] [class*="bg-[#f0fff8"] {
+  background: rgb(11 39 55 / 0.95) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea {
+  background-color: #111c2f !important;
+  border-color: rgb(71 85 105 / 0.8) !important;
+  color: #e5eefb !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] [class*="text-slate-950"],
+[data-theme="dark"] [class*="text-slate-900"],
+[data-theme="dark"] [class*="text-slate-800"],
+[data-theme="dark"] [class*="text-slate-700"] {
+  color: #e5eefb !important;
+}
+
+[data-theme="dark"] [class*="text-slate-600"],
+[data-theme="dark"] [class*="text-slate-500"],
+[data-theme="dark"] [class*="text-slate-400"] {
+  color: #a9b8cc !important;
+}
+
+[data-theme="dark"] [class*="border-slate-"],
+[data-theme="dark"] [class*="border-[#d"],
+[data-theme="dark"] [class*="border-[#c"] {
+  border-color: rgb(71 85 105 / 0.72) !important;
+}
+
+[data-theme="dark"] img[alt="FundsIndia"] {
+  mix-blend-mode: normal !important;
+  filter: brightness(1.08) contrast(1.03);
+}
+
+[data-theme="dark"] .fi-theme-toggle,
+[data-theme="dark"] [role="switch"] {
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+
+[data-theme="dark"] .fi-theme-toggle span,
+[data-theme="dark"] [role="switch"] span {
+  background: #ffffff !important;
+}
+
+[data-theme="dark"] .fi-card:hover {
+  box-shadow: 0 18px 44px rgb(0 0 0 / 0.28);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fi-route,
   .fi-screen,

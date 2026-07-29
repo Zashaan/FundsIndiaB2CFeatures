@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { clearSeen, isEnabled, setEnabled } from "@/lib/summary/weeklyGate";
+import { useTheme } from "@/lib/theme/themeContext";
 
 export function SettingsControls() {
   const [enabled, setEnabledState] = useState(true);
   const [resetMsg, setResetMsg] = useState("");
+  const { isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -25,6 +27,24 @@ export function SettingsControls() {
 
   return (
     <div className="space-y-3 px-4 py-4">
+      <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3">
+        <div>
+          <span className="text-sm font-medium text-slate-800">Dark Mode</span>
+          <p className="mt-1 text-xs text-slate-500">Use a lower-glare view across the app.</p>
+        </div>
+        <button
+          onClick={toggleTheme}
+          role="switch"
+          aria-checked={isDark}
+          aria-label="Toggle dark mode"
+          className={`fi-theme-toggle h-6 w-11 rounded-full p-0.5 transition-colors ${isDark ? "bg-blue-600" : "bg-slate-300"}`}
+        >
+          <span
+            className={`block h-5 w-5 rounded-full bg-white transition-transform ${isDark ? "translate-x-5" : ""}`}
+          />
+        </button>
+      </div>
+
       <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3">
         <span className="text-sm font-medium text-slate-800">Weekly Summary</span>
         <button
