@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type View =
   | "dashboard"
   | "detail"
+  | "edit"
   | "contributors"
   | "category"
   | "initial"
@@ -388,6 +389,10 @@ export function GoalsApp() {
   const [pendingInvites, setPendingInvites] = useState<Contributor[]>([
     { id: "pending-parent", name: "Meera Sharma", role: "Pending invite", initials: "MS" },
   ]);
+  const [editName, setEditName] = useState(initialGoals[0].name);
+  const [editTargetAmount, setEditTargetAmount] = useState(initialGoals[0].targetAmount);
+  const [editCurrentAmount, setEditCurrentAmount] = useState(initialGoals[0].currentAmount);
+  const [editTargetDate, setEditTargetDate] = useState(initialGoals[0].targetDate);
 
   const selectedGoal = goals.find((goal) => goal.id === selectedGoalId) ?? goals[0];
   const visibleGoals = goals.filter((goal) => goal.status === tab);
@@ -407,6 +412,77 @@ export function GoalsApp() {
     const multiplier = comparisonRisk === "Aggressive" ? 1.34 : comparisonRisk === "Moderate" ? 1.22 : 1.12;
     return Math.round(base * multiplier);
   }, [comparisonRisk, frequency, horizonYears, initialInvestment, sipAmount]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const goalId = params.get("goal");
+    const viewParam = params.get("view");
+
+    if (!goalId || viewParam !== "detail" || !initialGoals.some((goal) => goal.id === goalId)) return;
+
+    const timeout = window.setTimeout(() => {
+      setSelectedGoalId(goalId);
+      setView("detail");
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  const showDashboard = () => {
+    setView("dashboard");
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", "/goals");
+    }
+  };
+
+  const openGoalDetail = (goalId: string) => {
+    setSelectedGoalId(goalId);
+    setView("detail");
+    if (typeof window !== "undefined") {
+      window.history.pushState(null, "", `/goals?goal=${goalId}&view=detail`);
+    }
+  };
+
+  const startEditGoal = () => {
+    setEditName(selectedGoal.name);
+    setEditTargetAmount(selectedGoal.targetAmount);
+    setEditCurrentAmount(selectedGoal.currentAmount);
+    setEditTargetDate(selectedGoal.targetDate);
+    setView("edit");
+  };
+
+  const saveGoalEdits = () => {
+    const safeTarget = Math.max(1, editTargetAmount);
+    const safeCurrent = Math.max(0, editCurrentAmount);
+    const nextStatus =
+      safeCurrent >= safeTarget ? "Ahead" : safeCurrent / safeTarget >= 0.35 ? "On track" : "Behind";
+
+    setGoals((current) =>
+      current.map((goal) => {
+        if (goal.id !== selectedGoal.id) return goal;
+
+        const updatedHistory = goal.valueHistory.length
+          ? goal.valueHistory.map((point, index, history) =>
+              index === history.findLastIndex((item) => item.kind === "actual")
+                ? { ...point, value: safeCurrent }
+                : point,
+            )
+          : buildGoalHistory({ ...goal, targetAmount: safeTarget, currentAmount: safeCurrent, valueHistory: [] });
+
+        return {
+          ...goal,
+          name: editName.trim() || goal.name,
+          targetAmount: safeTarget,
+          currentAmount: safeCurrent,
+          targetDate: editTargetDate.trim() || goal.targetDate,
+          projectedStatus: nextStatus,
+          recentActivity: ["Goal details updated", ...goal.recentActivity.slice(0, 3)],
+          valueHistory: updatedHistory,
+        };
+      }),
+    );
+    setView("detail");
+  };
 
   const createGoal = () => {
     const id = `${goalCategory.id}-${Date.now()}`;
@@ -455,7 +531,7 @@ export function GoalsApp() {
   if (view === "detail") {
     return (
       <div className="fi-screen space-y-5 px-4 pb-28">
-        <StepHeader eyebrow={selectedGoal.category} title={selectedGoal.name} onBack={() => setView("dashboard")} />
+        <StepHeader eyebrow={selectedGoal.category} title={selectedGoal.name} onBack={showDashboard} />
         <section className="fi-card rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -535,15 +611,98 @@ export function GoalsApp() {
           </div>
         </section>
         <div className="grid grid-cols-2 gap-3">
-        <button className="fi-pressable h-12 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm">
+          <button
+            type="button"
+            onClick={startEditGoal}
+            className="fi-pressable h-12 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm"
+          >
             Edit goal
           </button>
           <Link
-            href={`/advisor-calls?goal=${selectedGoal.id}&goalName=${encodeURIComponent(selectedGoal.name)}&category=new_investment`}
+            href={`/advisor-calls?goal=${selectedGoal.id}&goalName=${encodeURIComponent(selectedGoal.name)}&category=new_investment&returnTo=${encodeURIComponent(`/goals?goal=${selectedGoal.id}&view=detail`)}`}
             className="fi-pressable flex h-12 items-center justify-center rounded-2xl bg-[#006bff] text-sm font-bold text-white shadow-sm"
           >
             Talk to advisor
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === "edit") {
+    const remaining = Math.max(0, editTargetAmount - editCurrentAmount);
+
+    return (
+      <div className="fi-screen space-y-5 px-4 pb-28">
+        <StepHeader eyebrow={selectedGoal.category} title="Edit goal" onBack={() => setView("detail")} />
+        <section className="fi-card rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_54%,#ffffff_100%)] p-5 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Goal health</p>
+          <h1 className="mt-1 text-3xl font-black text-slate-950">{rupee(remaining)} left</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Update the core goal details and FundsIndia will refresh progress, projections, and advisor context.
+          </p>
+        </section>
+        <section className="space-y-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+          <label className="block text-sm font-bold text-slate-900" htmlFor="edit-goal-name">
+            Goal name
+          </label>
+          <input
+            id="edit-goal-name"
+            value={editName}
+            onChange={(event) => setEditName(event.target.value)}
+            className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-900 outline-none transition-colors duration-200 focus:border-[#00a76f]"
+          />
+          <label className="block text-sm font-bold text-slate-900" htmlFor="edit-target-amount">
+            Target amount
+          </label>
+          <input
+            id="edit-target-amount"
+            type="number"
+            value={editTargetAmount}
+            onChange={(event) => setEditTargetAmount(Number(event.target.value))}
+            className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-900 outline-none transition-colors duration-200 focus:border-[#00a76f]"
+          />
+          <label className="block text-sm font-bold text-slate-900" htmlFor="edit-current-amount">
+            Current value
+          </label>
+          <input
+            id="edit-current-amount"
+            type="number"
+            value={editCurrentAmount}
+            onChange={(event) => setEditCurrentAmount(Number(event.target.value))}
+            className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-900 outline-none transition-colors duration-200 focus:border-[#00a76f]"
+          />
+          <label className="block text-sm font-bold text-slate-900" htmlFor="edit-target-date">
+            Target date
+          </label>
+          <input
+            id="edit-target-date"
+            value={editTargetDate}
+            onChange={(event) => setEditTargetDate(event.target.value)}
+            className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-900 outline-none transition-colors duration-200 focus:border-[#00a76f]"
+          />
+        </section>
+        <section className="rounded-3xl border border-[#d7edf8] bg-white p-4 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Advisor memory</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Rekha will see these updated numbers when you schedule a goal-related call, along with contribution history and recent activity.
+          </p>
+        </section>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => setView("detail")}
+            className="fi-pressable h-12 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={saveGoalEdits}
+            className="fi-pressable h-12 rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white shadow-sm"
+          >
+            Save changes
+          </button>
         </div>
       </div>
     );
@@ -896,10 +1055,7 @@ export function GoalsApp() {
             <GoalCard
               key={goal.id}
               goal={goal}
-              onOpen={() => {
-                setSelectedGoalId(goal.id);
-                setView("detail");
-              }}
+              onOpen={() => openGoalDetail(goal.id)}
             />
           ))}
         </section>

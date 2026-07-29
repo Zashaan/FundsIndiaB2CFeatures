@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 type Step = "home" | "category" | "context" | "time" | "confirm" | "history" | "detail" | "briefing";
@@ -229,6 +230,7 @@ function BottomAction({ label, onClick, disabled = false }: { label: string; onC
 }
 
 export function AdvisorCallsApp() {
+  const router = useRouter();
   const [step, setStep] = useState<Step>("home");
   const [categoryId, setCategoryId] = useState<CategoryId>("portfolio_review");
   const [categoryEditorOpen, setCategoryEditorOpen] = useState(false);
@@ -243,18 +245,25 @@ export function AdvisorCallsApp() {
   const [topicExpanded, setTopicExpanded] = useState(false);
   const [bookingCommitted, setBookingCommitted] = useState(false);
   const [selectedPastCallId, setSelectedPastCallId] = useState(pastCalls[0].id);
+  const [goalReturnTo, setGoalReturnTo] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const goalId = params.get("goal");
     const goalName = params.get("goalName");
     const categoryParam = params.get("category");
+    const returnTo = params.get("returnTo");
 
     if (!goalName) return;
 
     const timeout = window.setTimeout(() => {
+      const fallbackReturnTo = goalId ? `/goals?goal=${goalId}&view=detail` : null;
+      const safeReturnTo = returnTo?.startsWith("/goals") ? returnTo : fallbackReturnTo;
+
       setCategoryId(categoryParam === "new_investment" ? "new_investment" : "portfolio_review");
-      setSelectedGoalIds(["wealth"]);
+      setSelectedGoalIds(goalId && goals.some((goal) => goal.id === goalId) ? [goalId] : ["wealth"]);
       setTopicText(`I created a goal for ${goalName} and want to talk through the right investment plan with Rekha.`);
+      setGoalReturnTo(safeReturnTo);
       setStep("context");
     }, 0);
 
@@ -297,6 +306,15 @@ export function AdvisorCallsApp() {
     setSelectedGoalIds(["education"]);
     setTopicText(`Follow up on ${selectedPastCall.title}: ${selectedPastCall.action}`);
     setStep("context");
+  };
+
+  const goBackFromContext = () => {
+    if (goalReturnTo) {
+      router.push(goalReturnTo);
+      return;
+    }
+
+    setStep("category");
   };
 
   if (step === "history") {
@@ -453,7 +471,7 @@ export function AdvisorCallsApp() {
   if (step === "context") {
     return (
       <div className="fi-screen space-y-5 px-4 pb-36">
-        <StepHeader eyebrow="Page 2 of 4" title="Tell Rekha what is on your mind" progress={50} onBack={() => setStep("category")} />
+        <StepHeader eyebrow="Page 2 of 4" title="Tell Rekha what is on your mind" progress={50} onBack={goBackFromContext} />
 
         <section className="fi-card rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex flex-wrap items-center gap-2">
