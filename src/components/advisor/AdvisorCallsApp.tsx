@@ -72,32 +72,34 @@ const goals: Goal[] = [
 ];
 
 const suggestedSlots: Slot[] = [
-  { day: "Today", date: "28 Jul", time: "4:30 PM", note: "Best fit" },
-  { day: "Wed", date: "29 Jul", time: "11:00 AM", note: "Good fit" },
-  { day: "Thu", date: "30 Jul", time: "2:30 PM", note: "Open after lunch" },
-  { day: "Fri", date: "31 Jul", time: "5:00 PM", note: "End of day" },
+  { day: "Today", date: "30 Jul", time: "4:30 PM", note: "Best fit" },
+  { day: "Fri", date: "31 Jul", time: "11:00 AM", note: "Good fit" },
+  { day: "Mon", date: "3 Aug", time: "2:30 PM", note: "Open after lunch" },
+  { day: "Tue", date: "4 Aug", time: "5:00 PM", note: "End of day" },
 ];
 
-const manualDays = ["Today", "Wed", "Thu", "Fri", "Sat"];
+const defaultUpcomingSlot: Slot = { day: "Today", date: "30 Jul", time: "4:30 PM", note: "Education review" };
+
+const manualDays = ["Today", "Fri", "Mon", "Tue", "Wed"];
 const manualSlotsByDay: Record<string, Slot[]> = {
   Today: [
-    { day: "Today", date: "28 Jul", time: "4:30 PM", note: "Best fit" },
-    { day: "Today", date: "28 Jul", time: "6:00 PM", note: "Evening" },
-  ],
-  Wed: [
-    { day: "Wed", date: "29 Jul", time: "10:30 AM", note: "Morning" },
-    { day: "Wed", date: "29 Jul", time: "11:00 AM", note: "Good fit" },
-    { day: "Wed", date: "29 Jul", time: "3:00 PM", note: "Afternoon" },
-  ],
-  Thu: [
-    { day: "Thu", date: "30 Jul", time: "12:00 PM", note: "Midday" },
-    { day: "Thu", date: "30 Jul", time: "2:30 PM", note: "Open after lunch" },
+    { day: "Today", date: "30 Jul", time: "4:30 PM", note: "Best fit" },
+    { day: "Today", date: "30 Jul", time: "6:00 PM", note: "Evening" },
   ],
   Fri: [
     { day: "Fri", date: "31 Jul", time: "9:30 AM", note: "Early" },
+    { day: "Fri", date: "31 Jul", time: "11:00 AM", note: "Good fit" },
     { day: "Fri", date: "31 Jul", time: "5:00 PM", note: "End of day" },
   ],
-  Sat: [{ day: "Sat", date: "1 Aug", time: "11:30 AM", note: "Weekend" }],
+  Mon: [
+    { day: "Mon", date: "3 Aug", time: "12:00 PM", note: "Midday" },
+    { day: "Mon", date: "3 Aug", time: "2:30 PM", note: "Open after lunch" },
+  ],
+  Tue: [
+    { day: "Tue", date: "4 Aug", time: "10:30 AM", note: "Morning" },
+    { day: "Tue", date: "4 Aug", time: "5:00 PM", note: "End of day" },
+  ],
+  Wed: [{ day: "Wed", date: "5 Aug", time: "11:30 AM", note: "Late morning" }],
 };
 
 const pastCalls = [
@@ -274,6 +276,10 @@ export function AdvisorCallsApp() {
   const selectedGoals = goals.filter((goal) => selectedGoalIds.includes(goal.id));
   const topicIsValid = topicText.trim().length > 0;
   const selectedPastCall = pastCalls.find((call) => call.id === selectedPastCallId) ?? pastCalls[0];
+  const nextAdvisorySlot = suggestedSlots[0];
+  const upcomingSlot = bookingCommitted ? selectedSlot : defaultUpcomingSlot;
+  const [nextAdvisoryDay, nextAdvisoryMonth] = nextAdvisorySlot.date.split(" ");
+  const [upcomingDay, upcomingMonth] = upcomingSlot.date.split(" ");
 
   const advisorBrief = useMemo(() => {
     const goalsText = selectedGoals.length ? selectedGoals.map((goal) => goal.label).join(", ") : "no specific goal tag";
@@ -795,12 +801,12 @@ export function AdvisorCallsApp() {
         </p>
         <div className="mt-5 grid grid-cols-[auto_1fr] gap-3 rounded-3xl border border-[#d8e7f5] bg-white/80 p-3">
           <div className="flex h-12 w-12 flex-col items-center justify-center rounded-2xl bg-[#0f4c81] text-white">
-            <strong className="text-sm leading-none">28</strong>
-            <span className="text-[10px] font-bold">Jul</span>
+            <strong className="text-sm leading-none">{nextAdvisoryDay}</strong>
+            <span className="text-[10px] font-bold">{nextAdvisoryMonth}</span>
           </div>
           <div className="min-w-0">
             <p className="text-sm font-bold text-slate-950">Next advisory window</p>
-            <p className="text-xs leading-5 text-slate-500">4:30 PM · calendar-aware suggestions</p>
+            <p className="text-xs leading-5 text-slate-500">{nextAdvisorySlot.time} · calendar-aware suggestions</p>
           </div>
         </div>
         <button onClick={() => setStep("category")} className="fi-pressable mt-5 h-12 rounded-2xl bg-[linear-gradient(90deg,#006bff,#173f6f)] px-5 text-sm font-bold text-white shadow-lg shadow-blue-950/10">
@@ -817,13 +823,13 @@ export function AdvisorCallsApp() {
         </div>
         <div className="flex gap-3">
           <div className="flex h-14 w-12 shrink-0 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
-            <strong>{bookingCommitted ? "28" : "21"}</strong>
-            <span className="text-xs text-slate-500">Jul</span>
+            <strong>{upcomingDay}</strong>
+            <span className="text-xs text-slate-500">{upcomingMonth}</span>
           </div>
           <div className="min-w-0">
             <h3 className="font-bold text-slate-950">{bookingCommitted ? category.title : "Education goal review"}</h3>
             <p className="text-sm text-slate-500">
-              {bookingCommitted ? selectedSlot.time : "11:30 AM"} · {assignedAdvisor.name}
+              {upcomingSlot.time} · {assignedAdvisor.name}
             </p>
           </div>
         </div>
