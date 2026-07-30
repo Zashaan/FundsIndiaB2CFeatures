@@ -1513,36 +1513,6 @@ export function GoalsApp() {
         </section>
       )}
 
-      <section className="fi-card rounded-3xl border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8,#f8fbff)] p-4 shadow-sm">
-        <div className="flex gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#ecfff7] text-xs font-black text-[#00a76f]">
-            TR
-          </span>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Goal transfer</p>
-            <h2 className="font-bold text-slate-950">Move progress when priorities change</h2>
-            <p className="mt-1 text-sm leading-5 text-slate-600">
-              Shift money between active goals and see how both timelines change before confirming.
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => startTransfer()}
-            className="fi-pressable h-11 rounded-2xl bg-[#00a76f] text-sm font-bold text-white"
-          >
-            Transfer progress
-          </button>
-          <Link
-            href="/advisor-calls?category=portfolio_review&returnTo=%2Fgoals"
-            className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]"
-          >
-            Ask Rekha
-          </Link>
-        </div>
-      </section>
-
       <section className="fi-card rounded-3xl border border-[#d7edf8] bg-white p-4 shadow-sm">
         <div className="flex gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-black text-[#006bff]">
@@ -1574,6 +1544,36 @@ export function GoalsApp() {
             Invite to education
           </button>
           <Link href="/advisor-calls?category=portfolio_review" className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]">
+            Ask Rekha
+          </Link>
+        </div>
+      </section>
+
+      <section className="fi-card rounded-3xl border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8,#f8fbff)] p-4 shadow-sm">
+        <div className="flex gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#ecfff7] text-xs font-black text-[#00a76f]">
+            TR
+          </span>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Goal transfer</p>
+            <h2 className="font-bold text-slate-950">Move progress when priorities change</h2>
+            <p className="mt-1 text-sm leading-5 text-slate-600">
+              Shift money between active goals and see how both timelines change before confirming.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => startTransfer()}
+            className="fi-pressable h-11 rounded-2xl bg-[#00a76f] text-sm font-bold text-white"
+          >
+            Transfer progress
+          </button>
+          <Link
+            href="/advisor-calls?category=portfolio_review&returnTo=%2Fgoals"
+            className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]"
+          >
             Ask Rekha
           </Link>
         </div>
