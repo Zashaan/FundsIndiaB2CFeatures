@@ -8,6 +8,7 @@ type View =
   | "dashboard"
   | "detail"
   | "edit"
+  | "transfer"
   | "contributors"
   | "category"
   | "initial"
@@ -169,6 +170,75 @@ function progress(goal: Goal) {
 
 function remainingAmount(goal: Goal) {
   return Math.max(0, goal.targetAmount - goal.currentAmount);
+}
+
+const TIMELINE_BASE_YEAR = 2026;
+const TIMELINE_BASE_MONTH = 6;
+const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function monthlyContribution(goal: Goal) {
+  const monthly = goal.contributors.reduce((total, contributor) => {
+    const amount = contributor.amount?.match(/₹([\d,]+)\/mo/)?.[1];
+    return total + (amount ? Number(amount.replace(/,/g, "")) : 0);
+  }, 0);
+
+  return monthly || 25000;
+}
+
+function targetMonthOffset(goal: Goal) {
+  if (goal.targetDate.startsWith("Completed")) return 0;
+
+  const [monthLabel, yearLabel] = goal.targetDate.split(" ");
+  const monthIndex = SHORT_MONTHS.indexOf(monthLabel);
+  const year = Number(yearLabel);
+
+  if (monthIndex < 0 || Number.isNaN(year)) return 36;
+
+  return Math.max(0, (year - TIMELINE_BASE_YEAR) * 12 + monthIndex - TIMELINE_BASE_MONTH);
+}
+
+function timelineFromOffset(offset: number) {
+  if (offset <= 0) return "Ready now";
+
+  const absoluteMonth = TIMELINE_BASE_MONTH + offset;
+  const year = TIMELINE_BASE_YEAR + Math.floor(absoluteMonth / 12);
+  const month = SHORT_MONTHS[absoluteMonth % 12];
+
+  return `${month} ${year}`;
+}
+
+function transferTimeline(goal: Goal, amountDelta = 0) {
+  const baseOffset = targetMonthOffset(goal);
+  const shift = Math.round(Math.abs(amountDelta) / monthlyContribution(goal));
+  const nextOffset = amountDelta >= 0 ? Math.max(0, baseOffset - shift) : baseOffset + shift;
+
+  return {
+    label: timelineFromOffset(nextOffset),
+    months: nextOffset,
+  };
+}
+
+function transferImpactCopy(beforeMonths: number, afterMonths: number) {
+  const delta = afterMonths - beforeMonths;
+
+  if (delta === 0) return "No material timeline change";
+  if (delta > 0) return `${delta} ${delta === 1 ? "month" : "months"} later`;
+  return `${Math.abs(delta)} ${Math.abs(delta) === 1 ? "month" : "months"} faster`;
+}
+
+function statusFromProgress(currentAmount: number, targetAmount: number): Goal["projectedStatus"] {
+  if (currentAmount >= targetAmount) return "Ahead";
+  if (currentAmount / targetAmount >= 0.35) return "On track";
+  return "Behind";
+}
+
+function updateLatestActualHistory(goal: Goal, nextCurrentAmount: number) {
+  const history = goal.valueHistory.length ? goal.valueHistory : buildGoalHistory(goal);
+  const lastActualIndex = history.findLastIndex((point) => point.kind === "actual");
+
+  if (lastActualIndex < 0) return history;
+
+  return history.map((point, index) => (index === lastActualIndex ? { ...point, value: nextCurrentAmount } : point));
 }
 
 function goalStory(goal: Goal) {
@@ -425,12 +495,28 @@ export function GoalsApp() {
   const [editTargetAmount, setEditTargetAmount] = useState(initialGoals[0].targetAmount);
   const [editCurrentAmount, setEditCurrentAmount] = useState(initialGoals[0].currentAmount);
   const [editTargetDate, setEditTargetDate] = useState(initialGoals[0].targetDate);
+  const [transferFromId, setTransferFromId] = useState("home");
+  const [transferToId, setTransferToId] = useState("education");
+  const [transferAmount, setTransferAmount] = useState(250000);
+  const [transferConfirmOpen, setTransferConfirmOpen] = useState(false);
 
   const selectedGoal = goals.find((goal) => goal.id === selectedGoalId) ?? goals[0];
+  const activeTransferGoals = goals.filter((goal) => goal.status === "active");
   const visibleGoals = goals.filter((goal) => goal.status === tab);
   const activeGoalRemaining = goals
     .filter((goal) => goal.status === "active")
     .reduce((total, goal) => total + remainingAmount(goal), 0);
+  const transferFromGoal = goals.find((goal) => goal.id === transferFromId) ?? activeTransferGoals[0];
+  const transferToGoal =
+    goals.find((goal) => goal.id === transferToId && goal.id !== transferFromGoal.id) ??
+    activeTransferGoals.find((goal) => goal.id !== transferFromGoal.id) ??
+    transferFromGoal;
+  const maxTransferAmount = Math.max(0, transferFromGoal.currentAmount - 10000);
+  const safeTransferAmount = Math.min(Math.max(0, transferAmount), maxTransferAmount);
+  const transferFromBefore = transferTimeline(transferFromGoal);
+  const transferFromAfter = transferTimeline(transferFromGoal, -safeTransferAmount);
+  const transferToBefore = transferTimeline(transferToGoal);
+  const transferToAfter = transferTimeline(transferToGoal, safeTransferAmount);
   const inviteLooksExisting = inviteQuery.toLowerCase().includes("ananya") || inviteQuery.includes("@example.com");
   const inviteResult: InviteResult = inviteLooksExisting
     ? existingUserResult
@@ -476,6 +562,17 @@ export function GoalsApp() {
     if (typeof window !== "undefined") {
       window.history.pushState(null, "", `/goals?goal=${goalId}&view=detail`);
     }
+  };
+
+  const startTransfer = (fromId = transferFromId) => {
+    const fromGoal = goals.find((goal) => goal.id === fromId && goal.status === "active") ?? activeTransferGoals[0];
+    const toGoal = activeTransferGoals.find((goal) => goal.id !== fromGoal.id) ?? fromGoal;
+
+    setTransferFromId(fromGoal.id);
+    setTransferToId(toGoal.id);
+    setTransferAmount(Math.min(250000, Math.max(0, fromGoal.currentAmount - 10000)));
+    setTransferConfirmOpen(false);
+    setView("transfer");
   };
 
   const startEditGoal = () => {
@@ -561,6 +658,41 @@ export function GoalsApp() {
       initials: inviteResult.initials,
     };
     setPendingInvites((current) => [nextInvite, ...current]);
+  };
+
+  const confirmTransfer = () => {
+    if (!safeTransferAmount || transferFromGoal.id === transferToGoal.id) return;
+
+    setGoals((current) =>
+      current.map((goal) => {
+        if (goal.id !== transferFromGoal.id && goal.id !== transferToGoal.id) return goal;
+
+        const isSource = goal.id === transferFromGoal.id;
+        const counterpart = isSource ? transferToGoal : transferFromGoal;
+        const nextCurrentAmount = Math.max(
+          0,
+          isSource ? goal.currentAmount - safeTransferAmount : goal.currentAmount + safeTransferAmount,
+        );
+        const action = isSource
+          ? `Transferred ${rupee(safeTransferAmount)} to ${counterpart.name}`
+          : `Received ${rupee(safeTransferAmount)} from ${counterpart.name}`;
+
+        return {
+          ...goal,
+          currentAmount: nextCurrentAmount,
+          projectedStatus: statusFromProgress(nextCurrentAmount, goal.targetAmount),
+          recentActivity: [action, ...goal.recentActivity.slice(0, 3)],
+          valueHistory: updateLatestActualHistory(goal, nextCurrentAmount),
+        };
+      }),
+    );
+
+    setTransferConfirmOpen(false);
+    setSelectedGoalId(transferToGoal.id);
+    setView("detail");
+    if (typeof window !== "undefined") {
+      window.history.pushState(null, "", `/goals?goal=${transferToGoal.id}&view=detail`);
+    }
   };
 
   if (view === "detail") {
@@ -684,6 +816,15 @@ export function GoalsApp() {
             Talk to advisor
           </Link>
         </div>
+        {selectedGoal.status === "active" ? (
+          <button
+            type="button"
+            onClick={() => startTransfer(selectedGoal.id)}
+            className="fi-pressable h-12 w-full rounded-2xl border border-[#caefe3] bg-[#ecfff7] text-sm font-bold text-[#00a76f] shadow-sm"
+          >
+            Transfer progress
+          </button>
+        ) : null}
       </div>
     );
   }
@@ -763,6 +904,226 @@ export function GoalsApp() {
             Save changes
           </button>
         </div>
+      </div>
+    );
+  }
+
+  if (view === "transfer") {
+    const hasTwoGoals = activeTransferGoals.length > 1;
+    const advisorHref = `/advisor-calls?goal=${transferToGoal.id}&goalName=${encodeURIComponent(transferToGoal.name)}&category=portfolio_review&returnTo=${encodeURIComponent("/goals")}`;
+
+    return (
+      <div className="fi-screen space-y-5 px-4 pb-28">
+        <StepHeader eyebrow="Goal transfer" title="Move progress between goals" onBack={showDashboard} />
+        <section className="fi-card rounded-[28px] border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8_0%,#eef7ff_56%,#ffffff_100%)] p-5 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Priority changed?</p>
+          <h1 className="mt-1 text-2xl font-black leading-tight text-slate-950">See the trade-off before moving money</h1>
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            This models a goal-to-goal transfer so Ritik can understand which timeline slows down and which one accelerates before taking action.
+          </p>
+        </section>
+
+        <section className="fi-card space-y-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+          <label className="block text-sm font-bold text-slate-900" htmlFor="transfer-from-goal">
+            Take progress from
+          </label>
+          <select
+            id="transfer-from-goal"
+            value={transferFromGoal.id}
+            onChange={(event) => {
+              const nextFrom = event.target.value;
+              const nextTo = activeTransferGoals.find((goal) => goal.id !== nextFrom)?.id ?? nextFrom;
+              setTransferFromId(nextFrom);
+              if (transferToId === nextFrom) setTransferToId(nextTo);
+              const nextGoal = activeTransferGoals.find((goal) => goal.id === nextFrom);
+              if (nextGoal) setTransferAmount(Math.min(transferAmount, Math.max(0, nextGoal.currentAmount - 10000)));
+            }}
+            className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-900 outline-none transition-colors duration-200 focus:border-[#00a76f]"
+          >
+            {activeTransferGoals.map((goal) => (
+              <option key={goal.id} value={goal.id}>
+                {goal.name} · {rupee(goal.currentAmount)}
+              </option>
+            ))}
+          </select>
+
+          <label className="block text-sm font-bold text-slate-900" htmlFor="transfer-to-goal">
+            Put progress into
+          </label>
+          <select
+            id="transfer-to-goal"
+            value={transferToGoal.id}
+            onChange={(event) => setTransferToId(event.target.value)}
+            className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-900 outline-none transition-colors duration-200 focus:border-[#00a76f]"
+          >
+            {activeTransferGoals
+              .filter((goal) => goal.id !== transferFromGoal.id)
+              .map((goal) => (
+                <option key={goal.id} value={goal.id}>
+                  {goal.name} · {rupee(goal.currentAmount)}
+                </option>
+              ))}
+          </select>
+
+          <label className="block text-sm font-bold text-slate-900" htmlFor="transfer-amount">
+            Transfer amount
+          </label>
+          <input
+            id="transfer-amount"
+            type="number"
+            min="0"
+            max={maxTransferAmount}
+            value={transferAmount}
+            onChange={(event) => setTransferAmount(Number(event.target.value))}
+            className="h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-xl font-black text-slate-950 outline-none transition-colors duration-200 focus:border-[#00a76f]"
+          />
+          <div className="grid grid-cols-3 gap-2">
+            {[100000, 250000, 500000].map((amount) => (
+              <button
+                key={amount}
+                type="button"
+                onClick={() => setTransferAmount(Math.min(amount, maxTransferAmount))}
+                className="fi-pressable h-10 rounded-2xl border border-slate-200 bg-white text-xs font-bold text-slate-700"
+              >
+                {rupee(amount)}
+              </button>
+            ))}
+          </div>
+          {safeTransferAmount !== transferAmount ? (
+            <p className="rounded-2xl bg-amber-50 px-3 py-2 text-xs font-semibold leading-5 text-amber-700">
+              Transfer capped at {rupee(maxTransferAmount)} so the source goal keeps a small buffer.
+            </p>
+          ) : null}
+        </section>
+
+        <section className="fi-card rounded-3xl border border-[#d7edf8] bg-white p-4 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Timeline impact</p>
+          <div className="mt-4 space-y-3">
+            {[
+              {
+                label: transferFromGoal.name,
+                direction: "Money taken away",
+                before: transferFromBefore.label,
+                after: transferFromAfter.label,
+                impact: transferImpactCopy(transferFromBefore.months, transferFromAfter.months),
+                tone: "text-amber-700",
+                bg: "bg-amber-50",
+              },
+              {
+                label: transferToGoal.name,
+                direction: "Money added",
+                before: transferToBefore.label,
+                after: transferToAfter.label,
+                impact: transferImpactCopy(transferToBefore.months, transferToAfter.months),
+                tone: "text-[#00a76f]",
+                bg: "bg-[#ecfff7]",
+              },
+            ].map((item) => (
+              <div key={item.direction} className="rounded-2xl border border-slate-100 bg-slate-50 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-sm font-bold text-slate-950">{item.label}</h2>
+                    <p className="text-xs font-semibold text-slate-500">{item.direction}</p>
+                  </div>
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${item.bg} ${item.tone}`}>{item.impact}</span>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <div className="rounded-xl bg-white p-3">
+                    <p className="text-[11px] font-semibold text-slate-500">Before</p>
+                    <p className="mt-1 text-sm font-black text-slate-950">{item.before}</p>
+                  </div>
+                  <div className="rounded-xl bg-white p-3">
+                    <p className="text-[11px] font-semibold text-slate-500">After transfer</p>
+                    <p className="mt-1 text-sm font-black text-slate-950">{item.after}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="fi-card rounded-3xl border border-[#f7e3bf] bg-[linear-gradient(135deg,#fffdf7,#f8fbff)] p-4 shadow-sm">
+          <div className="flex gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-xs font-black text-amber-700">
+              RK
+            </span>
+            <div>
+              <h2 className="font-bold text-slate-950">Advisor continuity</h2>
+              <p className="mt-1 text-sm leading-5 text-slate-600">
+                Rekha can check tax, exit-load, and whether this transfer still matches the family&apos;s plan before money moves.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Link
+            href={advisorHref}
+            className="fi-pressable flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff] shadow-sm"
+          >
+            Talk to Rekha
+          </Link>
+          <button
+            type="button"
+            disabled={!hasTwoGoals || safeTransferAmount <= 0}
+            onClick={() => setTransferConfirmOpen(true)}
+            className="fi-pressable h-12 rounded-2xl bg-[linear-gradient(90deg,#00a76f,#006bff)] text-sm font-bold text-white shadow-sm disabled:opacity-50"
+          >
+            Review transfer
+          </button>
+        </div>
+
+        {transferConfirmOpen ? (
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/50 px-4 pb-4 backdrop-blur-sm">
+            <section className="fi-card w-full max-w-md rounded-[28px] border border-slate-200 bg-white p-5 shadow-2xl">
+              <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Confirm transfer</p>
+              <h2 className="mt-2 text-xl font-black leading-tight text-slate-950">Are you sure you want to do this?</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Move {rupee(safeTransferAmount)} from {transferFromGoal.name} to {transferToGoal.name}. This prototype updates
+                the goal progress immediately.
+              </p>
+              <div className="mt-4 space-y-2 rounded-2xl bg-slate-50 p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm text-slate-600">{transferFromGoal.name}</span>
+                  <strong className="text-right text-sm text-amber-700">
+                    {transferFromBefore.label} to {transferFromAfter.label}
+                  </strong>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm text-slate-600">{transferToGoal.name}</span>
+                  <strong className="text-right text-sm text-[#00a76f]">
+                    {transferToBefore.label} to {transferToAfter.label}
+                  </strong>
+                </div>
+              </div>
+              <p className="mt-3 text-xs leading-5 text-slate-500">
+                A real transfer may involve fund switches, tax impact, and exit loads, so advisor review is recommended.
+              </p>
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setTransferConfirmOpen(false)}
+                  className="fi-pressable h-11 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmTransfer}
+                  className="fi-pressable h-11 rounded-2xl bg-[#006bff] text-sm font-bold text-white"
+                >
+                  Confirm transfer
+                </button>
+              </div>
+              <Link
+                href={advisorHref}
+                className="fi-pressable mt-3 flex h-11 items-center justify-center rounded-2xl bg-[#ecfff7] text-sm font-bold text-[#00a76f]"
+              >
+                Talk to Rekha first
+              </Link>
+            </section>
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -1151,6 +1512,36 @@ export function GoalsApp() {
           </button>
         </section>
       )}
+
+      <section className="fi-card rounded-3xl border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8,#f8fbff)] p-4 shadow-sm">
+        <div className="flex gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#ecfff7] text-xs font-black text-[#00a76f]">
+            TR
+          </span>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Goal transfer</p>
+            <h2 className="font-bold text-slate-950">Move progress when priorities change</h2>
+            <p className="mt-1 text-sm leading-5 text-slate-600">
+              Shift money between active goals and see how both timelines change before confirming.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => startTransfer()}
+            className="fi-pressable h-11 rounded-2xl bg-[#00a76f] text-sm font-bold text-white"
+          >
+            Transfer progress
+          </button>
+          <Link
+            href="/advisor-calls?category=portfolio_review&returnTo=%2Fgoals"
+            className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]"
+          >
+            Ask Rekha
+          </Link>
+        </div>
+      </section>
 
       <section className="fi-card rounded-3xl border border-[#d7edf8] bg-white p-4 shadow-sm">
         <div className="flex gap-3">
