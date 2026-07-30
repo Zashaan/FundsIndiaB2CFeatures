@@ -185,6 +185,13 @@ function monthlyContribution(goal: Goal) {
   return monthly || 25000;
 }
 
+function monthlyContributionDisplay(goal: Goal) {
+  const hasMonthlyAmount = goal.contributors.some((contributor) => contributor.amount?.includes("/mo"));
+
+  if (!hasMonthlyAmount) return goal.status === "past" ? "Completed" : "Set after invite";
+  return rupee(monthlyContribution(goal));
+}
+
 function targetMonthOffset(goal: Goal) {
   if (goal.targetDate.startsWith("Completed")) return 0;
 
@@ -517,6 +524,12 @@ export function GoalsApp() {
   const transferFromAfter = transferTimeline(transferFromGoal, -safeTransferAmount);
   const transferToBefore = transferTimeline(transferToGoal);
   const transferToAfter = transferTimeline(transferToGoal, safeTransferAmount);
+  const detailTransferTarget = activeTransferGoals.find((goal) => goal.id !== selectedGoal.id);
+  const detailTransferAmount = Math.min(250000, Math.max(0, selectedGoal.currentAmount - 10000));
+  const detailTransferBefore = transferTimeline(selectedGoal);
+  const detailTransferAfter = transferTimeline(selectedGoal, -detailTransferAmount);
+  const detailTransferTargetBefore = detailTransferTarget ? transferTimeline(detailTransferTarget) : null;
+  const detailTransferTargetAfter = detailTransferTarget ? transferTimeline(detailTransferTarget, detailTransferAmount) : null;
   const inviteLooksExisting = inviteQuery.toLowerCase().includes("ananya") || inviteQuery.includes("@example.com");
   const inviteResult: InviteResult = inviteLooksExisting
     ? existingUserResult
@@ -766,17 +779,32 @@ export function GoalsApp() {
             ))}
           </div>
         </section>
-        <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-bold text-slate-950">Contributors</h2>
-          <button onClick={() => setView("contributors")} className="fi-pressable rounded-xl px-2 py-1 text-sm font-bold text-[#006bff]">
-              Add
-            </button>
+        <section className="fi-card rounded-3xl border border-[#d7edf8] bg-white p-4 shadow-sm">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-normal text-[#006bff]">Shared contributions</p>
+              <h2 className="mt-1 font-bold text-slate-950">Who is building this goal with you</h2>
+              <p className="mt-1 text-sm leading-5 text-slate-600">
+                {contributionMoment(selectedGoal)} FundsIndia keeps each person&apos;s commitment visible so couples and families can stay aligned.
+              </p>
+            </div>
+            <div className="-space-x-2 flex shrink-0">
+              {selectedGoal.contributors.map((contributor) => (
+                <ContributorAvatar key={contributor.id} contributor={contributor} />
+              ))}
+            </div>
           </div>
-          <p className="mb-3 rounded-2xl bg-[#ecfff7] p-3 text-xs font-semibold leading-5 text-[#00a76f]">
-            {contributionMoment(selectedGoal)}
-          </p>
-          <div className="space-y-3">
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="rounded-2xl bg-[#eef7ff] p-3">
+              <p className="text-[11px] font-bold uppercase tracking-normal text-[#006bff]">Monthly support</p>
+              <p className="mt-1 text-sm font-black text-slate-950">{monthlyContributionDisplay(selectedGoal)}</p>
+            </div>
+            <div className="rounded-2xl bg-[#ecfff7] p-3">
+              <p className="text-[11px] font-bold uppercase tracking-normal text-[#00a76f]">Shared progress</p>
+              <p className="mt-1 text-sm font-black text-slate-950">{progress(selectedGoal)}% funded</p>
+            </div>
+          </div>
+          <div className="mt-3 space-y-3">
             {selectedGoal.contributors.map((contributor) => (
               <div key={contributor.id} className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-3">
                 <div className="flex items-center gap-3">
@@ -790,7 +818,70 @@ export function GoalsApp() {
               </div>
             ))}
           </div>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setView("contributors")}
+              className="fi-pressable h-11 rounded-2xl bg-[#006bff] text-sm font-bold text-white"
+            >
+              Invite contributor
+            </button>
+            <Link
+              href={`/advisor-calls?goal=${selectedGoal.id}&goalName=${encodeURIComponent(selectedGoal.name)}&category=portfolio_review&returnTo=${encodeURIComponent(`/goals?goal=${selectedGoal.id}&view=detail`)}`}
+              className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]"
+            >
+              Ask Rekha
+            </Link>
+          </div>
         </section>
+        {selectedGoal.status === "active" && detailTransferTarget ? (
+          <section className="fi-card rounded-3xl border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8,#f8fbff)] p-4 shadow-sm">
+            <div className="flex gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#ecfff7] text-xs font-black text-[#00a76f]">
+                TR
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Transfer progress</p>
+                <h2 className="font-bold text-slate-950">Rebalance this goal if priorities change</h2>
+                <p className="mt-1 text-sm leading-5 text-slate-600">
+                  Preview the impact before moving money out of {selectedGoal.name}. Rekha can review tax and exit-load implications first.
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 rounded-2xl bg-white/80 p-3">
+              <p className="text-[11px] font-bold uppercase tracking-normal text-slate-500">Example impact for {rupee(detailTransferAmount)}</p>
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-slate-600">{selectedGoal.name}</span>
+                  <strong className="text-right text-sm text-amber-700">
+                    {detailTransferBefore.label} to {detailTransferAfter.label}
+                  </strong>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-slate-600">{detailTransferTarget.name}</span>
+                  <strong className="text-right text-sm text-[#00a76f]">
+                    {detailTransferTargetBefore?.label} to {detailTransferTargetAfter?.label}
+                  </strong>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => startTransfer(selectedGoal.id)}
+                className="fi-pressable h-11 rounded-2xl bg-[#00a76f] text-sm font-bold text-white"
+              >
+                Plan transfer
+              </button>
+              <Link
+                href={`/advisor-calls?goal=${selectedGoal.id}&goalName=${encodeURIComponent(selectedGoal.name)}&category=portfolio_review&returnTo=${encodeURIComponent(`/goals?goal=${selectedGoal.id}&view=detail`)}`}
+                className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]"
+              >
+                Ask Rekha
+              </Link>
+            </div>
+          </section>
+        ) : null}
         <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <h2 className="font-bold text-slate-950">Recent activity</h2>
           <div className="mt-3 space-y-2">
@@ -816,15 +907,6 @@ export function GoalsApp() {
             Talk to advisor
           </Link>
         </div>
-        {selectedGoal.status === "active" ? (
-          <button
-            type="button"
-            onClick={() => startTransfer(selectedGoal.id)}
-            className="fi-pressable h-12 w-full rounded-2xl border border-[#caefe3] bg-[#ecfff7] text-sm font-bold text-[#00a76f] shadow-sm"
-          >
-            Transfer progress
-          </button>
-        ) : null}
       </div>
     );
   }
@@ -1513,71 +1595,6 @@ export function GoalsApp() {
         </section>
       )}
 
-      <section className="fi-card rounded-3xl border border-[#d7edf8] bg-white p-4 shadow-sm">
-        <div className="flex gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#eef7ff] text-xs font-black text-[#006bff]">
-            CG
-          </span>
-          <div>
-            <h2 className="font-bold text-slate-950">Collaborative goals</h2>
-            <p className="mt-1 text-sm leading-5 text-slate-600">
-              Invite a spouse or family member to Daughter&apos;s education so both of you can contribute toward the same target.
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 rounded-2xl bg-[#ecfff7] p-3">
-          <p className="text-[11px] font-bold uppercase tracking-normal text-[#00a76f]">Invite destination</p>
-          <p className="mt-1 text-sm font-bold text-slate-950">Daughter&apos;s education</p>
-          <p className="mt-1 text-xs leading-5 text-slate-600">
-            This dashboard shortcut adds the collaborator to the active shared education goal.
-          </p>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedGoalId("education");
-              setView("contributors");
-            }}
-            className="fi-pressable h-11 rounded-2xl bg-[#00a76f] text-sm font-bold text-white"
-          >
-            Invite to education
-          </button>
-          <Link href="/advisor-calls?category=portfolio_review" className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]">
-            Ask Rekha
-          </Link>
-        </div>
-      </section>
-
-      <section className="fi-card rounded-3xl border border-[#caefe3] bg-[linear-gradient(135deg,#f0fff8,#f8fbff)] p-4 shadow-sm">
-        <div className="flex gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#ecfff7] text-xs font-black text-[#00a76f]">
-            TR
-          </span>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-normal text-[#00a76f]">Goal transfer</p>
-            <h2 className="font-bold text-slate-950">Move progress when priorities change</h2>
-            <p className="mt-1 text-sm leading-5 text-slate-600">
-              Shift money between active goals and see how both timelines change before confirming.
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => startTransfer()}
-            className="fi-pressable h-11 rounded-2xl bg-[#00a76f] text-sm font-bold text-white"
-          >
-            Transfer progress
-          </button>
-          <Link
-            href="/advisor-calls?category=portfolio_review&returnTo=%2Fgoals"
-            className="fi-pressable flex h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-sm font-bold text-[#006bff]"
-          >
-            Ask Rekha
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }
